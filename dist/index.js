@@ -169,12 +169,9 @@ define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/
             return this.data;
         }
         async setData(value) {
-            if (!this.checkValidation(value))
-                return;
             this.oldData = this.data;
             this.data = value;
             this.iframeElm.url = this.data.url || '';
-            console.log(this.data);
         }
         getTag() {
             return this.tag;

@@ -96,7 +96,6 @@ export default class ScomVideo extends Module implements PageBlock {
   }
 
   async setData(value: IData) {
-    if (!this.checkValidation(value)) return
     this.oldData = this.data
     this.data = value
     this.iframeElm.url = this.data.url || ''
