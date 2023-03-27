@@ -84,15 +84,7 @@ export default class ScomVideo extends Module implements PageBlock {
     return this.data.url ?? '';
   }
   set url(value: string) {
-    this.data.url = value;
-    this.iframeElm.url = this.data.url || ''
-
-    // if (this.data.url?.startsWith('ipfs://')) {
-    //   const ipfsGatewayUrl = getIPFSGatewayUrl()
-    //   this.iframeElm.url = this.data.url.replace('ipfs://', ipfsGatewayUrl)
-    // } else if (value) {
-    //   this.iframeElm.url = this.data.url
-    // }
+    this.setData({url: value});
   }
 
   getConfigSchema() {

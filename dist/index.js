@@ -160,15 +160,7 @@ define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/
             return (_a = this.data.url) !== null && _a !== void 0 ? _a : '';
         }
         set url(value) {
-            this.data.url = value;
-            console.log(this.data.url, this.id);
-            this.iframeElm.url = this.data.url || '';
-            // if (this.data.url?.startsWith('ipfs://')) {
-            //   const ipfsGatewayUrl = getIPFSGatewayUrl()
-            //   this.iframeElm.url = this.data.url.replace('ipfs://', ipfsGatewayUrl)
-            // } else if (value) {
-            //   this.iframeElm.url = this.data.url
-            // }
+            this.setData({ url: value });
         }
         getConfigSchema() {
             return configSchema;
@@ -182,6 +174,7 @@ define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/
             this.oldData = this.data;
             this.data = value;
             this.iframeElm.url = this.data.url || '';
+            console.log(this.data);
         }
         getTag() {
             return this.tag;
