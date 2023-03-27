@@ -9,9 +9,6 @@
     },
     "@modules/module1": {
       "path": "module1"
-    },
-    "@modules/createApproach": {
-      "path": "createApproach"
     }
   },
   "dependencies": {
@@ -23,11 +20,6 @@
       "caption": "Module 1",
       "url": "/module1",
       "module": "@modules/module1"
-    },
-    {
-      "caption": "Create Approach",
-      "url": "/createApproach",
-      "module": "@modules/createApproach"
     }
   ],
   "routes": [
@@ -35,10 +27,6 @@
       "url": "/module1",
       "module": "@modules/module1",
       "default": true
-    },
-    {
-      "url": "/createApproach",
-      "module": "@modules/createApproach"
     }
   ],
   "themes": {
