@@ -8,7 +8,7 @@ import {
   Iframe
 } from '@ijstech/components'
 import { IData, PageBlock } from './interface'
-import { getIPFSGatewayUrl, setDataFromSCConfig } from './store'
+import { setDataFromSCConfig } from './store'
 import './index.css'
 import scconfig from './scconfig.json';
 
@@ -70,7 +70,7 @@ export default class ScomVideo extends Module implements PageBlock {
     super.init()
     const width = this.getAttribute('width', true);
     const height = this.getAttribute('height', true);
-    this.setTag({width: width ? this.width : '500px', height: height ? this.height : '300px'});
+    this.setTag({width: width ? this.width : '480px', height: height ? this.height : '270px'});
     this.url = this.getAttribute('url', true);
   }
 
@@ -95,10 +95,21 @@ export default class ScomVideo extends Module implements PageBlock {
     return this.data
   }
 
+  private getUrl() {
+    if (!this.data.url) return '';
+    const urlRegex = /https:\/\/www.youtube.com\/embed/;
+    if (urlRegex.test(this.data.url)) return this.data.url;
+    const queryString = this.data.url.substring(this.data.url.indexOf('?') + 1) || ''
+    const query = new URLSearchParams(queryString);
+    const videoId = query.get('v');
+    if (videoId) return `https://www.youtube.com/embed/${videoId}`;
+    return this.data.url;
+  }
+
   async setData(value: IData) {
     this.oldData = this.data
     this.data = value
-    this.iframeElm.url = this.data.url || ''
+    this.iframeElm.url = this.getUrl()
   }
 
   getTag() {
