@@ -89,6 +89,7 @@ declare module "@scom/scom-video" {
             };
         };
         getData(): IData;
+        private getUrl;
         setData(value: IData): Promise<void>;
         getTag(): any;
         setTag(value: any): Promise<void>;

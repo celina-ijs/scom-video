@@ -67,7 +67,7 @@ define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/
             super.init();
             const width = this.getAttribute('width', true);
             const height = this.getAttribute('height', true);
-            this.setTag({ width: width ? this.width : '500px', height: height ? this.height : '300px' });
+            this.setTag({ width: width ? this.width : '480px', height: height ? this.height : '270px' });
             this.url = this.getAttribute('url', true);
             this.showHeader = this.getAttribute('showHeader', true);
             this.showFooter = this.getAttribute('showFooter', true);
@@ -82,14 +82,7 @@ define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/
             return (_a = this.data.url) !== null && _a !== void 0 ? _a : '';
         }
         set url(value) {
-            this.data.url = value;
-            this.iframeElm.url = this.data.url || '';
-            // if (this.data.url?.startsWith('ipfs://')) {
-            //   const ipfsGatewayUrl = getIPFSGatewayUrl()
-            //   this.iframeElm.url = this.data.url.replace('ipfs://', ipfsGatewayUrl)
-            // } else if (value) {
-            //   this.iframeElm.url = this.data.url
-            // }
+            this.setData({ url: value });
         }
         getConfigSchema() {
             return configSchema;
@@ -97,12 +90,23 @@ define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/
         getData() {
             return this.data;
         }
+        getUrl() {
+            if (!this.data.url)
+                return '';
+            const urlRegex = /https:\/\/www.youtube.com\/embed/;
+            if (urlRegex.test(this.data.url))
+                return this.data.url;
+            const queryString = this.data.url.substring(this.data.url.indexOf('?') + 1) || '';
+            const query = new URLSearchParams(queryString);
+            const videoId = query.get('v');
+            if (videoId)
+                return `https://www.youtube.com/embed/${videoId}`;
+            return this.data.url;
+        }
         async setData(value) {
-            if (!this.checkValidation(value))
-                return;
             this.oldData = this.data;
             this.data = value;
-            this.iframeElm.url = this.data.url || '';
+            this.iframeElm.url = this.getUrl();
             if (this.dappContainer) {
                 this.dappContainer.showHeader = this.showHeader;
                 this.dappContainer.showFooter = this.showFooter;
