@@ -30,32 +30,12 @@ declare module "@scom/scom-video/interface.ts" {
     }
     export interface IData {
         url: string;
+        showHeader?: boolean;
+        showFooter?: boolean;
     }
-}
-/// <amd-module name="@scom/scom-video/store.ts" />
-declare module "@scom/scom-video/store.ts" {
-    export const state: {
-        ipfsGatewayUrl: string;
-    };
-    export const setDataFromSCConfig: (options: any) => void;
-    export const setIPFSGatewayUrl: (url: string) => void;
-    export const getIPFSGatewayUrl: () => string;
 }
 /// <amd-module name="@scom/scom-video/index.css.ts" />
 declare module "@scom/scom-video/index.css.ts" { }
-/// <amd-module name="@scom/scom-video/scconfig.json.ts" />
-declare module "@scom/scom-video/scconfig.json.ts" {
-    const _default: {
-        name: string;
-        version: string;
-        env: string;
-        moduleDir: string;
-        main: string;
-        modules: {};
-        ipfsGatewayUrl: string;
-    };
-    export default _default;
-}
 /// <amd-module name="@scom/scom-video" />
 declare module "@scom/scom-video" {
     import { Module, IDataSchema, Container, ControlElement } from '@ijstech/components';
@@ -63,6 +43,8 @@ declare module "@scom/scom-video" {
     import "@scom/scom-video/index.css.ts";
     interface ScomVideoElement extends ControlElement {
         url: string;
+        showHeader?: boolean;
+        showFooter?: boolean;
     }
     global {
         namespace JSX {
@@ -75,6 +57,7 @@ declare module "@scom/scom-video" {
         private data;
         private oldData;
         private iframeElm;
+        private dappContainer;
         tag: any;
         readonly onConfirm: () => Promise<void>;
         readonly onDiscard: () => Promise<void>;
@@ -85,6 +68,10 @@ declare module "@scom/scom-video" {
         confirm: () => Promise<void>;
         discard: () => Promise<void>;
         constructor(parent?: Container, options?: any);
+        get showFooter(): boolean;
+        set showFooter(value: boolean);
+        get showHeader(): boolean;
+        set showHeader(value: boolean);
         init(): void;
         static create(options?: ScomVideoElement, parent?: Container): Promise<ScomVideo>;
         get url(): string;

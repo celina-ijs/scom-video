@@ -14,6 +14,9 @@
     "test": "cd test && npm run test && cd .."
   },
   "keywords": [],
+  "dependencies": {
+    "@scom/scom-dapp-container": "https://github.com/scom-repos/scom-dapp-container.git"
+  },
   "devDependencies": {
     "@ijstech/cli": "^0.1.26",
     "@ijstech/compiler": "^0.1.18",

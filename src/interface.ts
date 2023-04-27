@@ -38,4 +38,6 @@ export interface PageBlock {
 
 export interface IData {
 	url: string;
+  showHeader?: boolean;
+  showFooter?: boolean;
 }
