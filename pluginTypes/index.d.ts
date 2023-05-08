@@ -38,8 +38,7 @@ declare module "@scom/scom-video/interface.ts" {
 declare module "@scom/scom-video/index.css.ts" { }
 /// <amd-module name="@scom/scom-video" />
 declare module "@scom/scom-video" {
-    import { Module, IDataSchema, Container, ControlElement } from '@ijstech/components';
-    import { IData, PageBlock } from "@scom/scom-video/interface.ts";
+    import { Module, Container, ControlElement } from '@ijstech/components';
     import "@scom/scom-video/index.css.ts";
     interface ScomVideoElement extends ControlElement {
         url: string;
@@ -53,7 +52,7 @@ declare module "@scom/scom-video" {
             }
         }
     }
-    export default class ScomVideo extends Module implements PageBlock {
+    export default class ScomVideo extends Module {
         private data;
         private oldData;
         private iframeElm;
@@ -76,54 +75,23 @@ declare module "@scom/scom-video" {
         static create(options?: ScomVideoElement, parent?: Container): Promise<ScomVideo>;
         get url(): string;
         set url(value: string);
-        getConfigSchema(): {
-            type: string;
-            required: any[];
-            properties: {
-                width: {
-                    type: string;
-                };
-                height: {
-                    type: string;
-                };
-            };
-        };
-        getData(): IData;
+        private getData;
         private getUrl;
-        setData(value: IData): Promise<void>;
-        getTag(): any;
-        setTag(value: any): Promise<void>;
-        getEmbedderActions(): {
+        private setData;
+        private getTag;
+        private setTag;
+        private getEmbedderActions;
+        private getActions;
+        getConfigurators(): {
             name: string;
-            icon: string;
-            command: (builder: any, userInputData: any) => {
-                execute: () => void;
-                undo: () => void;
-                redo: () => void;
-            };
-            userInputDataSchema: IDataSchema;
+            target: string;
+            getActions: any;
+            getData: any;
+            setData: any;
+            getTag: any;
+            setTag: any;
         }[];
-        getActions(): {
-            name: string;
-            icon: string;
-            command: (builder: any, userInputData: any) => {
-                execute: () => void;
-                undo: () => void;
-                redo: () => void;
-            };
-            userInputDataSchema: IDataSchema;
-        }[];
-        _getActions(settingSchema: IDataSchema, themeSchema: IDataSchema): {
-            name: string;
-            icon: string;
-            command: (builder: any, userInputData: any) => {
-                execute: () => void;
-                undo: () => void;
-                redo: () => void;
-            };
-            userInputDataSchema: IDataSchema;
-        }[];
-        checkValidation(value: IData): boolean;
+        private _getActions;
         render(): any;
     }
 }

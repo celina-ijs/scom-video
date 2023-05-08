@@ -13,18 +13,18 @@ import {} from '@ijstech/eth-wallet'
 import ScomDappContainer from '@scom/scom-dapp-container'
 import './index.css'
 
-const configSchema = {
-  type: 'object',
-  required: [],
-  properties: {
-    width: {
-      type: 'string',
-    },
-    height: {
-      type: 'string'
-    }
-  }
-}
+// const configSchema = {
+//   type: 'object',
+//   required: [],
+//   properties: {
+//     width: {
+//       type: 'string',
+//     },
+//     height: {
+//       type: 'string'
+//     }
+//   }
+// }
 
 interface ScomVideoElement extends ControlElement {
   url: string;
@@ -42,7 +42,7 @@ declare global {
 
 @customModule
 @customElements('i-scom-video')
-export default class ScomVideo extends Module implements PageBlock {
+export default class ScomVideo extends Module {
   private data: IData = {
     url: ''
   };
@@ -107,11 +107,11 @@ export default class ScomVideo extends Module implements PageBlock {
     this.setData({url: value});
   }
 
-  getConfigSchema() {
-    return configSchema
-  }
+  // getConfigSchema() {
+  //   return configSchema
+  // }
 
-  getData() {
+  private getData() {
     return this.data
   }
 
@@ -126,7 +126,7 @@ export default class ScomVideo extends Module implements PageBlock {
     return this.data.url;
   }
 
-  async setData(value: IData) {
+  private async setData(value: IData) {
     this.oldData = this.data
     this.data = value
     this.iframeElm.url = this.getUrl()
@@ -136,11 +136,11 @@ export default class ScomVideo extends Module implements PageBlock {
     }
   }
 
-  getTag() {
+  private getTag() {
     return this.tag
   }
 
-  async setTag(value: any) {
+  private async setTag(value: any) {
     this.tag = value;
     if (this.dappContainer) {
       this.dappContainer.width = this.tag.width;
@@ -148,14 +148,13 @@ export default class ScomVideo extends Module implements PageBlock {
     }
   }
 
-  getEmbedderActions() {
+  private getEmbedderActions() {
     const propertiesSchema: IDataSchema = {
-      "type": "object",
-      "properties": {
-        "url": {
-          "type": "string",
-          "minLength": 1,
-          required: true
+      type: "object",
+      required: ["url"],
+      properties: {
+        url: {
+          type: "string"
         }
       }
     };
@@ -177,14 +176,13 @@ export default class ScomVideo extends Module implements PageBlock {
     return this._getActions(propertiesSchema, themeSchema);
   }
 
-  getActions() {
+  private getActions() {
     const propertiesSchema: IDataSchema = {
-      "type": "object",
-      "properties": {
-        "url": {
-          "type": "string",
-          "minLength": 1,
-          required: true
+      type: "object",
+      required: ["url"],
+      properties: {
+        url: {
+          type: "string"
         }
       }
     };
@@ -204,7 +202,30 @@ export default class ScomVideo extends Module implements PageBlock {
     return this._getActions(propertiesSchema, themeSchema);
   }
 
-  _getActions(settingSchema: IDataSchema, themeSchema: IDataSchema) {
+  getConfigurators() {
+    return [
+      {
+        name: 'Builder Configurator',
+        target: 'Builders',
+        getActions: this.getActions.bind(this),
+        getData: this.getData.bind(this),
+        setData: this.setData.bind(this),
+        getTag: this.getTag.bind(this),
+        setTag: this.setTag.bind(this)
+      },
+      {
+        name: 'Emdedder Configurator',
+        target: 'Embedders',
+        getActions: this.getEmbedderActions.bind(this),
+        getData: this.getData.bind(this),
+        setData: this.setData.bind(this),
+        getTag: this.getTag.bind(this),
+        setTag: this.setTag.bind(this)
+      }
+    ]
+  }
+
+  private _getActions(settingSchema: IDataSchema, themeSchema: IDataSchema) {
     const actions = [
       {
         name: 'Settings',
@@ -226,10 +247,6 @@ export default class ScomVideo extends Module implements PageBlock {
       }
     ]
     return actions
-  }
-
-  checkValidation(value: IData): boolean {
-    return !!value.url;
   }
 
   render() {

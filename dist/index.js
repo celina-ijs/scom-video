@@ -23,18 +23,6 @@ define("@scom/scom-video/index.css.ts", ["require", "exports", "@ijstech/compone
 define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/scom-video/index.css.ts"], function (require, exports, components_2) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    const configSchema = {
-        type: 'object',
-        required: [],
-        properties: {
-            width: {
-                type: 'string',
-            },
-            height: {
-                type: 'string'
-            }
-        }
-    };
     let ScomVideo = class ScomVideo extends components_2.Module {
         constructor(parent, options) {
             super(parent, options);
@@ -84,9 +72,9 @@ define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/
         set url(value) {
             this.setData({ url: value });
         }
-        getConfigSchema() {
-            return configSchema;
-        }
+        // getConfigSchema() {
+        //   return configSchema
+        // }
         getData() {
             return this.data;
         }
@@ -124,12 +112,11 @@ define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/
         }
         getEmbedderActions() {
             const propertiesSchema = {
-                "type": "object",
-                "properties": {
-                    "url": {
-                        "type": "string",
-                        "minLength": 1,
-                        required: true
+                type: "object",
+                required: ["url"],
+                properties: {
+                    url: {
+                        type: "string"
                     }
                 }
             };
@@ -150,12 +137,11 @@ define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/
         }
         getActions() {
             const propertiesSchema = {
-                "type": "object",
-                "properties": {
-                    "url": {
-                        "type": "string",
-                        "minLength": 1,
-                        required: true
+                type: "object",
+                required: ["url"],
+                properties: {
+                    url: {
+                        type: "string"
                     }
                 }
             };
@@ -171,6 +157,28 @@ define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/
                 }
             };
             return this._getActions(propertiesSchema, themeSchema);
+        }
+        getConfigurators() {
+            return [
+                {
+                    name: 'Builder Configurator',
+                    target: 'Builders',
+                    getActions: this.getActions.bind(this),
+                    getData: this.getData.bind(this),
+                    setData: this.setData.bind(this),
+                    getTag: this.getTag.bind(this),
+                    setTag: this.setTag.bind(this)
+                },
+                {
+                    name: 'Emdedder Configurator',
+                    target: 'Embedders',
+                    getActions: this.getEmbedderActions.bind(this),
+                    getData: this.getData.bind(this),
+                    setData: this.setData.bind(this),
+                    getTag: this.getTag.bind(this),
+                    setTag: this.setTag.bind(this)
+                }
+            ];
         }
         _getActions(settingSchema, themeSchema) {
             const actions = [
@@ -196,9 +204,6 @@ define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/
                 }
             ];
             return actions;
-        }
-        checkValidation(value) {
-            return !!value.url;
         }
         render() {
             return (this.$render("i-scom-dapp-container", { id: "dappContainer", showWalletNetwork: false, display: "block" },
