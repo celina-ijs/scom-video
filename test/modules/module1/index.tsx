@@ -26,6 +26,8 @@ export default class Module1 extends Module {
                 url="https://www.youtube.com/watch?v=Wlf1T5nrO50"
                 width={500}
                 height={300}
+                showHeader={false}
+                showFooter={false}
                ></i-scom-video>
             </i-hstack>
         </i-panel>

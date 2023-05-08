@@ -7,10 +7,11 @@ import {
   customElements,
   Iframe
 } from '@ijstech/components'
-import { IData } from './interface'
-import { setDataFromSCConfig } from './store'
+import { IData, PageBlock } from './interface'
+import {} from '@ijstech/eth-contract'
+import {} from '@ijstech/eth-wallet'
+import ScomDappContainer from '@scom/scom-dapp-container'
 import './index.css'
-import scconfig from './scconfig.json';
 
 // const configSchema = {
 //   type: 'object',
@@ -27,6 +28,8 @@ import scconfig from './scconfig.json';
 
 interface ScomVideoElement extends ControlElement {
   url: string;
+  showHeader?: boolean;
+  showFooter?: boolean;
 }
 
 declare global {
@@ -47,6 +50,7 @@ export default class ScomVideo extends Module {
     url: ''
   };
   private iframeElm: Iframe
+  private dappContainer: ScomDappContainer
 
   tag: any
 
@@ -62,8 +66,22 @@ export default class ScomVideo extends Module {
 
   constructor(parent?: Container, options?: any) {
     super(parent, options);
-    if (scconfig)
-      setDataFromSCConfig(scconfig);
+  }
+
+  get showFooter() {
+    return this.data.showFooter ?? true
+  }
+  set showFooter(value: boolean) {
+    this.data.showFooter = value
+    if (this.dappContainer) this.dappContainer.showFooter = this.showFooter;
+  }
+
+  get showHeader() {
+    return this.data.showHeader ?? true
+  }
+  set showHeader(value: boolean) {
+    this.data.showHeader = value
+    if (this.dappContainer) this.dappContainer.showHeader = this.showHeader;
   }
   
   init() {
@@ -72,6 +90,8 @@ export default class ScomVideo extends Module {
     const height = this.getAttribute('height', true);
     this.setTag({width: width ? this.width : '480px', height: height ? this.height : '270px'});
     this.url = this.getAttribute('url', true);
+    this.showHeader = this.getAttribute('showHeader', true)
+    this.showFooter = this.getAttribute('showFooter', true)
   }
 
   static async create(options?: ScomVideoElement, parent?: Container){
@@ -110,6 +130,10 @@ export default class ScomVideo extends Module {
     this.oldData = this.data
     this.data = value
     this.iframeElm.url = this.getUrl()
+    if (this.dappContainer) {
+      this.dappContainer.showHeader = this.showHeader;
+      this.dappContainer.showFooter = this.showFooter;
+    }
   }
 
   private getTag() {
@@ -118,10 +142,9 @@ export default class ScomVideo extends Module {
 
   private async setTag(value: any) {
     this.tag = value;
-    if (this.iframeElm) {
-      this.iframeElm.display = 'block';
-      this.iframeElm.width = this.tag.width;
-      this.iframeElm.height = this.tag.height;
+    if (this.dappContainer) {
+      this.dappContainer.width = this.tag.width;
+      this.dappContainer.height = this.tag.height;
     }
   }
 
@@ -228,9 +251,9 @@ export default class ScomVideo extends Module {
 
   render() {
     return (
-      <i-panel>
-        <i-iframe id="iframeElm"></i-iframe>
-      </i-panel>
+      <i-scom-dapp-container id="dappContainer" showWalletNetwork={false} display="block">
+        <i-iframe id="iframeElm" width="100%" height="100%" display="flex"></i-iframe>
+      </i-scom-dapp-container>
     )
   }
 }
