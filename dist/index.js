@@ -8,6 +8,17 @@ define("@scom/scom-video/interface.ts", ["require", "exports"], function (requir
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
 });
+define("@scom/scom-video/data.json.ts", ["require", "exports"], function (require, exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    ///<amd-module name='@scom/scom-video/data.json.ts'/> 
+    exports.default = {
+        "ipfsGatewayUrl": "https://ipfs.scom.dev/ipfs/",
+        "defaultBuilderData": {
+            "url": "https://www.youtube.com/embed/Wlf1T5nrO50"
+        }
+    };
+});
 define("@scom/scom-video/index.css.ts", ["require", "exports", "@ijstech/components"], function (require, exports, components_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -20,7 +31,7 @@ define("@scom/scom-video/index.css.ts", ["require", "exports", "@ijstech/compone
         }
     });
 });
-define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/scom-video/index.css.ts"], function (require, exports, components_2) {
+define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/scom-video/data.json.ts", "@scom/scom-video/index.css.ts"], function (require, exports, components_2, data_json_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     let ScomVideo = class ScomVideo extends components_2.Module {
@@ -32,6 +43,19 @@ define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/
             this.oldData = {
                 url: ''
             };
+            this.tag = {};
+        }
+        static async create(options, parent) {
+            let self = new this(parent, options);
+            await self.ready();
+            return self;
+        }
+        get url() {
+            var _a;
+            return (_a = this.data.url) !== null && _a !== void 0 ? _a : '';
+        }
+        set url(value) {
+            this.setData({ url: value });
         }
         get showFooter() {
             var _a;
@@ -60,23 +84,16 @@ define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/
             this.showHeader = this.getAttribute('showHeader', true);
             this.showFooter = this.getAttribute('showFooter', true);
         }
-        static async create(options, parent) {
-            let self = new this(parent, options);
-            await self.ready();
-            return self;
-        }
-        get url() {
-            var _a;
-            return (_a = this.data.url) !== null && _a !== void 0 ? _a : '';
-        }
-        set url(value) {
-            this.setData({ url: value });
-        }
-        // getConfigSchema() {
-        //   return configSchema
-        // }
         getData() {
             return this.data;
+        }
+        async setData(value) {
+            this.data = value;
+            this.iframeElm.url = this.getUrl();
+            if (this.dappContainer) {
+                this.dappContainer.showHeader = this.showHeader;
+                this.dappContainer.showFooter = this.showFooter;
+            }
         }
         getUrl() {
             if (!this.data.url)
@@ -91,15 +108,6 @@ define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/
                 return `https://www.youtube.com/embed/${videoId}`;
             return this.data.url;
         }
-        async setData(value) {
-            this.oldData = this.data;
-            this.data = value;
-            this.iframeElm.url = this.getUrl();
-            if (this.dappContainer) {
-                this.dappContainer.showHeader = this.showHeader;
-                this.dappContainer.showFooter = this.showFooter;
-            }
-        }
         getTag() {
             return this.tag;
         }
@@ -110,75 +118,66 @@ define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/
                 this.dappContainer.height = this.tag.height;
             }
         }
-        getEmbedderActions() {
-            const propertiesSchema = {
-                type: "object",
-                required: ["url"],
-                properties: {
-                    url: {
-                        type: "string"
-                    }
-                }
-            };
-            const themeSchema = {
-                type: 'object',
-                properties: {
-                    width: {
-                        type: 'string',
-                        readOnly: true
-                    },
-                    height: {
-                        type: 'string',
-                        readOnly: true
-                    }
-                }
-            };
-            return this._getActions(propertiesSchema, themeSchema);
-        }
-        getActions() {
-            const propertiesSchema = {
-                type: "object",
-                required: ["url"],
-                properties: {
-                    url: {
-                        type: "string"
-                    }
-                }
-            };
-            const themeSchema = {
-                type: 'object',
-                properties: {
-                    width: {
-                        type: 'string'
-                    },
-                    height: {
-                        type: 'string'
-                    }
-                }
-            };
-            return this._getActions(propertiesSchema, themeSchema);
-        }
         getConfigurators() {
             return [
                 {
                     name: 'Builder Configurator',
                     target: 'Builders',
-                    getActions: this.getActions.bind(this),
+                    getActions: () => {
+                        const propertiesSchema = this.getPropertiesSchema();
+                        const themeSchema = this.getThemeSchema();
+                        return this._getActions(propertiesSchema, themeSchema);
+                    },
                     getData: this.getData.bind(this),
-                    setData: this.setData.bind(this),
+                    setData: async (data) => {
+                        const defaultData = data_json_1.default.defaultBuilderData;
+                        await this.setData(Object.assign(Object.assign({}, defaultData), data));
+                    },
                     getTag: this.getTag.bind(this),
                     setTag: this.setTag.bind(this)
                 },
                 {
                     name: 'Emdedder Configurator',
                     target: 'Embedders',
-                    getActions: this.getEmbedderActions.bind(this),
+                    getActions: () => {
+                        const propertiesSchema = this.getPropertiesSchema();
+                        const themeSchema = this.getThemeSchema(true);
+                        return this._getActions(propertiesSchema, themeSchema);
+                    },
                     getData: this.getData.bind(this),
                     setData: this.setData.bind(this),
                     getTag: this.getTag.bind(this),
                     setTag: this.setTag.bind(this)
                 }
             ];
+        }
+        getPropertiesSchema() {
+            const schema = {
+                type: "object",
+                required: ["url"],
+                properties: {
+                    url: {
+                        type: "string"
+                    }
+                }
+            };
+            return schema;
+        }
+        getThemeSchema(readOnly = false) {
+            const themeSchema = {
+                type: 'object',
+                properties: {
+                    width: {
+                        type: 'string',
+                        readOnly
+                    },
+                    height: {
+                        type: 'string',
+                        readOnly
+                    }
+                }
+            };
+            return themeSchema;
         }
         _getActions(settingSchema, themeSchema) {
             const actions = [
@@ -188,14 +187,18 @@ define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/
                     command: (builder, userInputData) => {
                         return {
                             execute: () => {
+                                this.oldData = Object.assign({}, this.data);
+                                if (userInputData === null || userInputData === void 0 ? void 0 : userInputData.url)
+                                    this.data.url = userInputData.url;
                                 if (builder === null || builder === void 0 ? void 0 : builder.setData)
-                                    builder.setData(userInputData);
-                                this.setData(userInputData);
+                                    builder.setData(this.data);
+                                this.setData(this.data);
                             },
                             undo: () => {
+                                this.data = Object.assign({}, this.oldData);
                                 if (builder === null || builder === void 0 ? void 0 : builder.setData)
-                                    builder.setData(this.oldData);
-                                this.setData(this.oldData);
+                                    builder.setData(this.data);
+                                this.setData(this.data);
                             },
                             redo: () => { }
                         };
