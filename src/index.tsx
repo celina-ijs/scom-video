@@ -7,24 +7,12 @@ import {
   customElements,
   Iframe
 } from '@ijstech/components'
-import { IData, PageBlock } from './interface'
+import { IData } from './interface'
 import {} from '@ijstech/eth-contract'
 import {} from '@ijstech/eth-wallet'
 import ScomDappContainer from '@scom/scom-dapp-container'
+import dataJson from './data.json'
 import './index.css'
-
-// const configSchema = {
-//   type: 'object',
-//   required: [],
-//   properties: {
-//     width: {
-//       type: 'string',
-//     },
-//     height: {
-//       type: 'string'
-//     }
-//   }
-// }
 
 interface ScomVideoElement extends ControlElement {
   url: string;
@@ -52,7 +40,7 @@ export default class ScomVideo extends Module {
   private iframeElm: Iframe
   private dappContainer: ScomDappContainer
 
-  tag: any
+  tag: any = {}
 
   readonly onConfirm: () => Promise<void>
   readonly onDiscard: () => Promise<void>
@@ -66,6 +54,19 @@ export default class ScomVideo extends Module {
 
   constructor(parent?: Container, options?: any) {
     super(parent, options);
+  }
+
+  static async create(options?: ScomVideoElement, parent?: Container){
+    let self = new this(parent, options);
+    await self.ready();
+    return self;
+  }
+
+  get url() {
+    return this.data.url ?? '';
+  }
+  set url(value: string) {
+    this.setData({url: value});
   }
 
   get showFooter() {
@@ -94,25 +95,17 @@ export default class ScomVideo extends Module {
     this.showFooter = this.getAttribute('showFooter', true)
   }
 
-  static async create(options?: ScomVideoElement, parent?: Container){
-    let self = new this(parent, options);
-    await self.ready();
-    return self;
-  }
-
-  get url() {
-    return this.data.url ?? '';
-  }
-  set url(value: string) {
-    this.setData({url: value});
-  }
-
-  // getConfigSchema() {
-  //   return configSchema
-  // }
-
   private getData() {
     return this.data
+  }
+
+  private async setData(value: IData) {
+    this.data = value
+    this.iframeElm.url = this.getUrl()
+    if (this.dappContainer) {
+      this.dappContainer.showHeader = this.showHeader;
+      this.dappContainer.showFooter = this.showFooter;
+    }
   }
 
   private getUrl() {
@@ -124,16 +117,6 @@ export default class ScomVideo extends Module {
     const videoId = query.get('v');
     if (videoId) return `https://www.youtube.com/embed/${videoId}`;
     return this.data.url;
-  }
-
-  private async setData(value: IData) {
-    this.oldData = this.data
-    this.data = value
-    this.iframeElm.url = this.getUrl()
-    if (this.dappContainer) {
-      this.dappContainer.showHeader = this.showHeader;
-      this.dappContainer.showFooter = this.showFooter;
-    }
   }
 
   private getTag() {
@@ -148,81 +131,68 @@ export default class ScomVideo extends Module {
     }
   }
 
-  private getEmbedderActions() {
-    const propertiesSchema: IDataSchema = {
-      type: "object",
-      required: ["url"],
-      properties: {
-        url: {
-          type: "string"
-        }
-      }
-    };
-
-    const themeSchema: IDataSchema = {
-      type: 'object',
-      properties: {
-        width: {
-          type: 'string',
-          readOnly: true
-        },
-        height: {
-          type: 'string',
-          readOnly: true
-        }
-      }
-    }
-
-    return this._getActions(propertiesSchema, themeSchema);
-  }
-
-  private getActions() {
-    const propertiesSchema: IDataSchema = {
-      type: "object",
-      required: ["url"],
-      properties: {
-        url: {
-          type: "string"
-        }
-      }
-    };
-
-    const themeSchema: IDataSchema = {
-      type: 'object',
-      properties: {
-        width: {
-          type: 'string'
-        },
-        height: {
-          type: 'string'
-        }
-      }
-    }
-
-    return this._getActions(propertiesSchema, themeSchema);
-  }
-
   getConfigurators() {
     return [
       {
         name: 'Builder Configurator',
         target: 'Builders',
-        getActions: this.getActions.bind(this),
+        getActions: () => {
+          const propertiesSchema = this.getPropertiesSchema();
+          const themeSchema = this.getThemeSchema();
+          return this._getActions(propertiesSchema, themeSchema);
+        },
         getData: this.getData.bind(this),
-        setData: this.setData.bind(this),
+        setData: async (data: IData) => {
+          const defaultData = dataJson.defaultBuilderData as any;
+          await this.setData({...defaultData, ...data})
+        },
         getTag: this.getTag.bind(this),
         setTag: this.setTag.bind(this)
       },
       {
         name: 'Emdedder Configurator',
         target: 'Embedders',
-        getActions: this.getEmbedderActions.bind(this),
+        getActions: () => {
+          const propertiesSchema = this.getPropertiesSchema();
+          const themeSchema = this.getThemeSchema(true);
+          return this._getActions(propertiesSchema, themeSchema);
+        },
         getData: this.getData.bind(this),
         setData: this.setData.bind(this),
         getTag: this.getTag.bind(this),
         setTag: this.setTag.bind(this)
       }
     ]
+  }
+
+  private getPropertiesSchema() {
+    const schema: IDataSchema = {
+      type: "object",
+      required: ["url"],
+      properties: {
+        url: {
+          type: "string"
+        }
+      }
+    };
+    return schema;
+  }
+
+  private getThemeSchema(readOnly = false) {
+    const themeSchema: IDataSchema = {
+      type: 'object',
+      properties: {
+        width: {
+          type: 'string',
+          readOnly
+        },
+        height: {
+          type: 'string',
+          readOnly
+        }
+      }
+    }
+    return themeSchema;
   }
 
   private _getActions(settingSchema: IDataSchema, themeSchema: IDataSchema) {
@@ -233,12 +203,15 @@ export default class ScomVideo extends Module {
         command: (builder: any, userInputData: any) => {
           return {
             execute: () => {
-              if (builder?.setData) builder.setData(userInputData);
-              this.setData(userInputData);
+              this.oldData = {...this.data};
+              if (userInputData?.url) this.data.url = userInputData.url
+              if (builder?.setData) builder.setData(this.data);
+              this.setData(this.data);
             },
             undo: () => {
-              if (builder?.setData) builder.setData(this.oldData);
-              this.setData(this.oldData);
+              this.data = {...this.oldData};
+              if (builder?.setData) builder.setData(this.data);
+              this.setData(this.data);
             },
             redo: () => {}
           }

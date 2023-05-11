@@ -34,11 +34,21 @@ declare module "@scom/scom-video/interface.ts" {
         showFooter?: boolean;
     }
 }
+/// <amd-module name="@scom/scom-video/data.json.ts" />
+declare module "@scom/scom-video/data.json.ts" {
+    const _default: {
+        ipfsGatewayUrl: string;
+        defaultBuilderData: {
+            url: string;
+        };
+    };
+    export default _default;
+}
 /// <amd-module name="@scom/scom-video/index.css.ts" />
 declare module "@scom/scom-video/index.css.ts" { }
 /// <amd-module name="@scom/scom-video" />
 declare module "@scom/scom-video" {
-    import { Module, Container, ControlElement } from '@ijstech/components';
+    import { Module, IDataSchema, Container, ControlElement } from '@ijstech/components';
     import "@scom/scom-video/index.css.ts";
     interface ScomVideoElement extends ControlElement {
         url: string;
@@ -67,30 +77,39 @@ declare module "@scom/scom-video" {
         confirm: () => Promise<void>;
         discard: () => Promise<void>;
         constructor(parent?: Container, options?: any);
+        static create(options?: ScomVideoElement, parent?: Container): Promise<ScomVideo>;
+        get url(): string;
+        set url(value: string);
         get showFooter(): boolean;
         set showFooter(value: boolean);
         get showHeader(): boolean;
         set showHeader(value: boolean);
         init(): void;
-        static create(options?: ScomVideoElement, parent?: Container): Promise<ScomVideo>;
-        get url(): string;
-        set url(value: string);
         private getData;
-        private getUrl;
         private setData;
+        private getUrl;
         private getTag;
         private setTag;
-        private getEmbedderActions;
-        private getActions;
         getConfigurators(): {
             name: string;
             target: string;
-            getActions: any;
+            getActions: () => {
+                name: string;
+                icon: string;
+                command: (builder: any, userInputData: any) => {
+                    execute: () => void;
+                    undo: () => void;
+                    redo: () => void;
+                };
+                userInputDataSchema: IDataSchema;
+            }[];
             getData: any;
             setData: any;
             getTag: any;
             setTag: any;
         }[];
+        private getPropertiesSchema;
+        private getThemeSchema;
         private _getActions;
         render(): any;
     }
