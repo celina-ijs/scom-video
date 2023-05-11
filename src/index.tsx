@@ -34,9 +34,6 @@ export default class ScomVideo extends Module {
   private data: IData = {
     url: ''
   };
-  private oldData: IData = {
-    url: ''
-  };
   private iframeElm: Iframe
   private dappContainer: ScomDappContainer
 
@@ -70,7 +67,7 @@ export default class ScomVideo extends Module {
   }
 
   get showFooter() {
-    return this.data.showFooter ?? true
+    return this.data.showFooter ?? false
   }
   set showFooter(value: boolean) {
     this.data.showFooter = value
@@ -78,7 +75,7 @@ export default class ScomVideo extends Module {
   }
 
   get showHeader() {
-    return this.data.showHeader ?? true
+    return this.data.showHeader ?? false
   }
   set showHeader(value: boolean) {
     this.data.showHeader = value
@@ -91,8 +88,8 @@ export default class ScomVideo extends Module {
     const height = this.getAttribute('height', true);
     this.setTag({width: width ? this.width : '480px', height: height ? this.height : '270px'});
     this.url = this.getAttribute('url', true);
-    this.showHeader = this.getAttribute('showHeader', true)
-    this.showFooter = this.getAttribute('showFooter', true)
+    this.showHeader = this.getAttribute('showHeader', true, false)
+    this.showFooter = this.getAttribute('showFooter', true, false)
   }
 
   private getData() {
@@ -201,17 +198,18 @@ export default class ScomVideo extends Module {
         name: 'Settings',
         icon: 'cog',
         command: (builder: any, userInputData: any) => {
+          let oldData = {url: ''};
           return {
             execute: () => {
-              this.oldData = {...this.data};
-              if (userInputData?.url) this.data.url = userInputData.url
+              oldData = {...this.data};
+              if (userInputData?.url) this.data.url = userInputData.url;
+              this.iframeElm.url = this.getUrl();
               if (builder?.setData) builder.setData(this.data);
-              this.setData(this.data);
             },
             undo: () => {
-              this.data = {...this.oldData};
+              this.data = {...oldData};
+              this.iframeElm.url = this.getUrl();
               if (builder?.setData) builder.setData(this.data);
-              this.setData(this.data);
             },
             redo: () => {}
           }

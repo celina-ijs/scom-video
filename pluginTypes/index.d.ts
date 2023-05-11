@@ -64,7 +64,6 @@ declare module "@scom/scom-video" {
     }
     export default class ScomVideo extends Module {
         private data;
-        private oldData;
         private iframeElm;
         private dappContainer;
         tag: any;
