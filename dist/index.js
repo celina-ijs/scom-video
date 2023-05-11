@@ -40,9 +40,6 @@ define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/
             this.data = {
                 url: ''
             };
-            this.oldData = {
-                url: ''
-            };
             this.tag = {};
         }
         static async create(options, parent) {
@@ -59,7 +56,7 @@ define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/
         }
         get showFooter() {
             var _a;
-            return (_a = this.data.showFooter) !== null && _a !== void 0 ? _a : true;
+            return (_a = this.data.showFooter) !== null && _a !== void 0 ? _a : false;
         }
         set showFooter(value) {
             this.data.showFooter = value;
@@ -68,7 +65,7 @@ define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/
         }
         get showHeader() {
             var _a;
-            return (_a = this.data.showHeader) !== null && _a !== void 0 ? _a : true;
+            return (_a = this.data.showHeader) !== null && _a !== void 0 ? _a : false;
         }
         set showHeader(value) {
             this.data.showHeader = value;
@@ -81,8 +78,8 @@ define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/
             const height = this.getAttribute('height', true);
             this.setTag({ width: width ? this.width : '480px', height: height ? this.height : '270px' });
             this.url = this.getAttribute('url', true);
-            this.showHeader = this.getAttribute('showHeader', true);
-            this.showFooter = this.getAttribute('showFooter', true);
+            this.showHeader = this.getAttribute('showHeader', true, false);
+            this.showFooter = this.getAttribute('showFooter', true, false);
         }
         getData() {
             return this.data;
@@ -185,20 +182,21 @@ define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/
                     name: 'Settings',
                     icon: 'cog',
                     command: (builder, userInputData) => {
+                        let oldData = { url: '' };
                         return {
                             execute: () => {
-                                this.oldData = Object.assign({}, this.data);
+                                oldData = Object.assign({}, this.data);
                                 if (userInputData === null || userInputData === void 0 ? void 0 : userInputData.url)
                                     this.data.url = userInputData.url;
+                                this.iframeElm.url = this.getUrl();
                                 if (builder === null || builder === void 0 ? void 0 : builder.setData)
                                     builder.setData(this.data);
-                                this.setData(this.data);
                             },
                             undo: () => {
-                                this.data = Object.assign({}, this.oldData);
+                                this.data = Object.assign({}, oldData);
+                                this.iframeElm.url = this.getUrl();
                                 if (builder === null || builder === void 0 ? void 0 : builder.setData)
                                     builder.setData(this.data);
-                                this.setData(this.data);
                             },
                             redo: () => { }
                         };
