@@ -15,7 +15,7 @@
   },
   "keywords": [],
   "dependencies": {
-    "@scom/scom-dapp-container": "https://github.com/scom-repos/scom-dapp-container.git"
+    "@scom/scom-dapp-container": "^0.1.4"
   },
   "devDependencies": {
     "@ijstech/cli": "^0.1.26",
