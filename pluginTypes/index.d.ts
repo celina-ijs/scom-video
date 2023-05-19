@@ -49,6 +49,7 @@ declare module "@scom/scom-video/index.css.ts" { }
 /// <amd-module name="@scom/scom-video" />
 declare module "@scom/scom-video" {
     import { Module, IDataSchema, Container, ControlElement } from '@ijstech/components';
+    import { IData } from "@scom/scom-video/interface.ts";
     import "@scom/scom-video/index.css.ts";
     interface ScomVideoElement extends ControlElement {
         url: string;
@@ -89,7 +90,7 @@ declare module "@scom/scom-video" {
         private getUrl;
         private getTag;
         private setTag;
-        getConfigurators(): {
+        getConfigurators(): ({
             name: string;
             target: string;
             getActions: () => {
@@ -103,10 +104,33 @@ declare module "@scom/scom-video" {
                 userInputDataSchema: IDataSchema;
             }[];
             getData: any;
+            setData: (data: IData) => Promise<void>;
+            getTag: any;
+            setTag: any;
+            getLinkParams?: undefined;
+            setLinkParams?: undefined;
+        } | {
+            name: string;
+            target: string;
+            getActions: () => {
+                name: string;
+                icon: string;
+                command: (builder: any, userInputData: any) => {
+                    execute: () => void;
+                    undo: () => void;
+                    redo: () => void;
+                };
+                userInputDataSchema: IDataSchema;
+            }[];
+            getLinkParams: () => {
+                data: string;
+            };
+            setLinkParams: (params: any) => Promise<void>;
+            getData: any;
             setData: any;
             getTag: any;
             setTag: any;
-        }[];
+        })[];
         private getPropertiesSchema;
         private getThemeSchema;
         private _getActions;
