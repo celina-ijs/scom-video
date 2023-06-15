@@ -52,6 +52,7 @@ declare module "@scom/scom-video" {
     import { IData } from "@scom/scom-video/interface.ts";
     import "@scom/scom-video/index.css.ts";
     interface ScomVideoElement extends ControlElement {
+        lazyLoad?: boolean;
         url: string;
         showHeader?: boolean;
         showFooter?: boolean;

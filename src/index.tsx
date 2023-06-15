@@ -15,6 +15,7 @@ import dataJson from './data.json'
 import './index.css'
 
 interface ScomVideoElement extends ControlElement {
+  lazyLoad?: boolean;
   url: string;
   showHeader?: boolean;
   showFooter?: boolean;
@@ -87,9 +88,12 @@ export default class ScomVideo extends Module {
     const width = this.getAttribute('width', true);
     const height = this.getAttribute('height', true);
     this.setTag({width: width ? this.width : '480px', height: height ? this.height : '270px'});
-    this.url = this.getAttribute('url', true);
-    this.showHeader = this.getAttribute('showHeader', true, false)
-    this.showFooter = this.getAttribute('showFooter', true, false)
+    const lazyLoad = this.getAttribute('lazyLoad', true, false);
+    if (!lazyLoad) {
+      this.url = this.getAttribute('url', true);
+      this.showHeader = this.getAttribute('showHeader', true, false)
+      this.showFooter = this.getAttribute('showFooter', true, false)
+    }
   }
 
   private getData() {
@@ -100,8 +104,10 @@ export default class ScomVideo extends Module {
     this.data = value
     this.iframeElm.url = this.getUrl()
     if (this.dappContainer) {
-      this.dappContainer.showHeader = this.showHeader;
-      this.dappContainer.showFooter = this.showFooter;
+      this.dappContainer.setData({
+        showHeader: this.showHeader,
+        showFooter: this.showFooter
+      })
     }
   }
 
