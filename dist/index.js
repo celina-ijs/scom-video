@@ -114,10 +114,13 @@ define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/
             return this.tag;
         }
         async setTag(value) {
+            var _a, _b;
             this.tag = value;
             if (this.dappContainer) {
-                this.dappContainer.width = this.tag.width;
-                this.dappContainer.height = this.tag.height;
+                if ((_a = this.tag) === null || _a === void 0 ? void 0 : _a.width)
+                    this.dappContainer.width = this.tag.width;
+                if ((_b = this.tag) === null || _b === void 0 ? void 0 : _b.height)
+                    this.dappContainer.height = this.tag.height;
             }
         }
         getConfigurators() {
@@ -228,7 +231,7 @@ define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/
             return actions;
         }
         render() {
-            return (this.$render("i-scom-dapp-container", { id: "dappContainer", showWalletNetwork: false, display: "block" },
+            return (this.$render("i-scom-dapp-container", { id: "dappContainer", showWalletNetwork: false, display: "block", maxWidth: "100%" },
                 this.$render("i-iframe", { id: "iframeElm", width: "100%", height: "100%", display: "flex" })));
         }
     };
