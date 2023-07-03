@@ -129,8 +129,8 @@ export default class ScomVideo extends Module {
   private async setTag(value: any) {
     this.tag = value;
     if (this.dappContainer) {
-      this.dappContainer.width = this.tag.width;
-      this.dappContainer.height = this.tag.height;
+      if (this.tag?.width) this.dappContainer.width = this.tag.width;
+      if (this.tag?.height) this.dappContainer.height = this.tag.height;
     }
   }
 
@@ -247,7 +247,7 @@ export default class ScomVideo extends Module {
 
   render() {
     return (
-      <i-scom-dapp-container id="dappContainer" showWalletNetwork={false} display="block">
+      <i-scom-dapp-container id="dappContainer" showWalletNetwork={false} display="block" maxWidth="100%">
         <i-iframe id="iframeElm" width="100%" height="100%" display="flex"></i-iframe>
       </i-scom-dapp-container>
     )
