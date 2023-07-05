@@ -89,6 +89,7 @@ declare module "@scom/scom-video" {
         private getData;
         private setData;
         private getUrl;
+        getVideoId(url: string): string;
         private getTag;
         private setTag;
         getConfigurators(): ({
