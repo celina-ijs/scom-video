@@ -100,15 +100,20 @@ define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/
         getUrl() {
             if (!this.data.url)
                 return '';
-            const urlRegex = /https:\/\/www.youtube.com\/embed/;
-            if (urlRegex.test(this.data.url))
-                return this.data.url;
-            const queryString = this.data.url.substring(this.data.url.indexOf('?') + 1) || '';
-            const query = new URLSearchParams(queryString);
-            const videoId = query.get('v');
+            // const urlRegex = /https:\/\/www.youtube.com\/embed/;
+            // if (urlRegex.test(this.data.url)) return this.data.url;
+            // const queryString = this.data.url.substring(this.data.url.indexOf('?') + 1) || ''
+            // const query = new URLSearchParams(queryString);
+            // const videoId = query.get('v');
+            const videoId = this.getVideoId(this.data.url);
             if (videoId)
                 return `https://www.youtube.com/embed/${videoId}`;
             return this.data.url;
+        }
+        getVideoId(url) {
+            var _a;
+            let regex = /(youtu.*be.*)\/(watch\?v=|embed\/|v|shorts|)(.*?((?=[&#?])|$))/gm;
+            return (_a = regex.exec(url)) === null || _a === void 0 ? void 0 : _a[3];
         }
         getTag() {
             return this.tag;

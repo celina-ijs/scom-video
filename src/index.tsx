@@ -113,13 +113,19 @@ export default class ScomVideo extends Module {
 
   private getUrl() {
     if (!this.data.url) return '';
-    const urlRegex = /https:\/\/www.youtube.com\/embed/;
-    if (urlRegex.test(this.data.url)) return this.data.url;
-    const queryString = this.data.url.substring(this.data.url.indexOf('?') + 1) || ''
-    const query = new URLSearchParams(queryString);
-    const videoId = query.get('v');
+    // const urlRegex = /https:\/\/www.youtube.com\/embed/;
+    // if (urlRegex.test(this.data.url)) return this.data.url;
+    // const queryString = this.data.url.substring(this.data.url.indexOf('?') + 1) || ''
+    // const query = new URLSearchParams(queryString);
+    // const videoId = query.get('v');
+    const videoId = this.getVideoId(this.data.url);
     if (videoId) return `https://www.youtube.com/embed/${videoId}`;
     return this.data.url;
+  }
+  
+  getVideoId(url: string) {
+    let regex = /(youtu.*be.*)\/(watch\?v=|embed\/|v|shorts|)(.*?((?=[&#?])|$))/gm;
+    return regex.exec(url)?.[3];
   }
 
   private getTag() {
