@@ -12,22 +12,6 @@ declare module "@scom/scom-video/interface.ts" {
         command: (builder: any, userInputData: any) => ICommand;
         userInputDataSchema: IDataSchema;
     }
-    export interface PageBlock {
-        getActions: () => IPageBlockAction[];
-        getData: () => any;
-        setData: (data: any) => Promise<void>;
-        getTag: () => any;
-        setTag: (tag: any) => Promise<void>;
-        defaultEdit?: boolean;
-        tag?: any;
-        validate?: () => boolean;
-        readonly onEdit: () => Promise<void>;
-        readonly onConfirm: () => Promise<void>;
-        readonly onDiscard: () => Promise<void>;
-        edit: () => Promise<void>;
-        confirm: () => Promise<void>;
-        discard: () => Promise<void>;
-    }
     export interface IData {
         url: string;
         showHeader?: boolean;
@@ -69,9 +53,6 @@ declare module "@scom/scom-video" {
         private iframeElm;
         private dappContainer;
         tag: any;
-        readonly onConfirm: () => Promise<void>;
-        readonly onDiscard: () => Promise<void>;
-        readonly onEdit: () => Promise<void>;
         defaultEdit?: boolean;
         validate?: () => boolean;
         edit: () => Promise<void>;

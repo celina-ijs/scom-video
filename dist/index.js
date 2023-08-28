@@ -208,8 +208,8 @@ define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/
         _getActions(settingSchema, themeSchema) {
             const actions = [
                 {
-                    name: 'Settings',
-                    icon: 'cog',
+                    name: 'Edit',
+                    icon: 'edit',
                     command: (builder, userInputData) => {
                         let oldData = { url: '' };
                         return {
