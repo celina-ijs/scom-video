@@ -40,10 +40,6 @@ export default class ScomVideo extends Module {
 
   tag: any = {}
 
-  readonly onConfirm: () => Promise<void>
-  readonly onDiscard: () => Promise<void>
-  readonly onEdit: () => Promise<void>
-
   defaultEdit?: boolean
   validate?: () => boolean
   edit: () => Promise<void>
@@ -226,8 +222,8 @@ export default class ScomVideo extends Module {
   private _getActions(settingSchema: IDataSchema, themeSchema: IDataSchema) {
     const actions = [
       {
-        name: 'Settings',
-        icon: 'cog',
+        name: 'Edit',
+        icon: 'edit',
         command: (builder: any, userInputData: any) => {
           let oldData = {url: ''};
           return {
