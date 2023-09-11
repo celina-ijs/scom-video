@@ -5,11 +5,9 @@ import {
   Container,
   ControlElement,
   customElements,
-  Iframe
+  Panel
 } from '@ijstech/components'
 import { IData } from './interface'
-import {} from '@ijstech/eth-contract'
-import {} from '@ijstech/eth-wallet'
 import ScomDappContainer from '@scom/scom-dapp-container'
 import dataJson from './data.json'
 import './index.css'
@@ -35,8 +33,9 @@ export default class ScomVideo extends Module {
   private data: IData = {
     url: ''
   };
-  private iframeElm: Iframe
   private dappContainer: ScomDappContainer
+  private pnlVideo: Panel
+  private videoEl: any
 
   tag: any = {}
 
@@ -60,7 +59,8 @@ export default class ScomVideo extends Module {
     return this.data.url ?? '';
   }
   set url(value: string) {
-    this.setData({url: value});
+    this.data.url = value ?? '';
+    this.updateVideo();
   }
 
   get showFooter() {
@@ -79,16 +79,22 @@ export default class ScomVideo extends Module {
     if (this.dappContainer) this.dappContainer.showHeader = this.showHeader;
   }
   
-  init() {
+  private get ism3u8() {
+    const regex = /.*\.m3u8$/gi
+    return regex.test(this.data?.url || '')
+  }
+
+  async init() {
     super.init()
     const width = this.getAttribute('width', true);
     const height = this.getAttribute('height', true);
     this.setTag({width: width ? this.width : '480px', height: height ? this.height : '270px'});
     const lazyLoad = this.getAttribute('lazyLoad', true, false);
     if (!lazyLoad) {
-      this.url = this.getAttribute('url', true);
-      this.showHeader = this.getAttribute('showHeader', true, false)
-      this.showFooter = this.getAttribute('showFooter', true, false)
+      const url = this.getAttribute('url', true);
+      const showHeader = this.getAttribute('showHeader', true, false);
+      const showFooter = this.getAttribute('showFooter', true, false);
+      await this.setData({ url, showFooter, showHeader });
     }
   }
 
@@ -98,9 +104,9 @@ export default class ScomVideo extends Module {
 
   private async setData(value: IData) {
     this.data = value
-    this.iframeElm.url = this.getUrl()
+    this.updateVideo()
     if (this.dappContainer) {
-      this.dappContainer.setData({
+      await this.dappContainer.setData({
         showHeader: this.showHeader,
         showFooter: this.showFooter
       })
@@ -109,19 +115,27 @@ export default class ScomVideo extends Module {
 
   private getUrl() {
     if (!this.data.url) return '';
-    // const urlRegex = /https:\/\/www.youtube.com\/embed/;
-    // if (urlRegex.test(this.data.url)) return this.data.url;
-    // const queryString = this.data.url.substring(this.data.url.indexOf('?') + 1) || ''
-    // const query = new URLSearchParams(queryString);
-    // const videoId = query.get('v');
     const videoId = this.getVideoId(this.data.url);
     if (videoId) return `https://www.youtube.com/embed/${videoId}`;
     return this.data.url;
   }
   
-  getVideoId(url: string) {
+  private getVideoId(url: string) {
     let regex = /(youtu.*be.*)\/(watch\?v=|embed\/|v|shorts|)(.*?((?=[&#?])|$))/gm;
     return regex.exec(url)?.[3];
+  }
+
+  private updateVideo() {
+    if (!this.videoEl) {
+      this.pnlVideo.clearInnerHTML()
+      if (this.ism3u8) {
+        this.videoEl = <i-video></i-video>
+      } else {
+        this.videoEl = <i-iframe width="100%" height="100%" display="flex"></i-iframe>
+      }
+      this.pnlVideo.append(this.videoEl)
+    }
+    this.videoEl.url = this.ism3u8 ? this.data.url : this.getUrl()
   }
 
   private getTag() {
@@ -144,8 +158,7 @@ export default class ScomVideo extends Module {
         target: 'Builders',
         getActions: () => {
           const propertiesSchema = this.getPropertiesSchema();
-          const themeSchema = this.getThemeSchema();
-          return this._getActions(propertiesSchema, themeSchema);
+          return this._getActions(propertiesSchema);
         },
         getData: this.getData.bind(this),
         setData: async (data: IData) => {
@@ -160,8 +173,7 @@ export default class ScomVideo extends Module {
         target: 'Embedders',
         getActions: () => {
           const propertiesSchema = this.getPropertiesSchema();
-          const themeSchema = this.getThemeSchema(true);
-          return this._getActions(propertiesSchema, themeSchema);
+          return this._getActions(propertiesSchema);
         },
         getLinkParams: () => {
           const data = this.data || {};
@@ -202,24 +214,7 @@ export default class ScomVideo extends Module {
     return schema;
   }
 
-  private getThemeSchema(readOnly = false) {
-    const themeSchema: IDataSchema = {
-      type: 'object',
-      properties: {
-        width: {
-          type: 'string',
-          readOnly
-        },
-        height: {
-          type: 'string',
-          readOnly
-        }
-      }
-    }
-    return themeSchema;
-  }
-
-  private _getActions(settingSchema: IDataSchema, themeSchema: IDataSchema) {
+  private _getActions(settingSchema: IDataSchema) {
     const actions = [
       {
         name: 'Edit',
@@ -230,12 +225,12 @@ export default class ScomVideo extends Module {
             execute: () => {
               oldData = {...this.data};
               if (userInputData?.url) this.data.url = userInputData.url;
-              this.iframeElm.url = this.getUrl();
+              this.updateVideo();
               if (builder?.setData) builder.setData(this.data);
             },
             undo: () => {
               this.data = {...oldData};
-              this.iframeElm.url = this.getUrl();
+              this.updateVideo();
               if (builder?.setData) builder.setData(this.data);
             },
             redo: () => {}
@@ -250,7 +245,7 @@ export default class ScomVideo extends Module {
   render() {
     return (
       <i-scom-dapp-container id="dappContainer" showWalletNetwork={false} display="block" maxWidth="100%">
-        <i-iframe id="iframeElm" width="100%" height="100%" display="flex"></i-iframe>
+        <i-panel id="pnlVideo" width={'100%'} height={'100%'}/>
       </i-scom-dapp-container>
     )
   }
