@@ -53,7 +53,7 @@ define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/
         }
         set url(value) {
             this.data.url = value !== null && value !== void 0 ? value : '';
-            this.iframeElm.url = this.getUrl();
+            this.updateVideo();
         }
         get showFooter() {
             var _a;
@@ -73,6 +73,11 @@ define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/
             if (this.dappContainer)
                 this.dappContainer.showHeader = this.showHeader;
         }
+        get ism3u8() {
+            var _a;
+            const regex = /.*\.m3u8$/gi;
+            return regex.test(((_a = this.data) === null || _a === void 0 ? void 0 : _a.url) || '');
+        }
         async init() {
             super.init();
             const width = this.getAttribute('width', true);
@@ -91,10 +96,10 @@ define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/
         }
         async setData(value) {
             this.data = value;
-            this.iframeElm.url = this.getUrl();
+            this.updateVideo();
             if (this.dappContainer) {
                 await this.dappContainer.setData({
-                    showHeader: false,
+                    showHeader: this.showHeader,
                     showFooter: this.showFooter
                 });
             }
@@ -102,11 +107,6 @@ define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/
         getUrl() {
             if (!this.data.url)
                 return '';
-            // const urlRegex = /https:\/\/www.youtube.com\/embed/;
-            // if (urlRegex.test(this.data.url)) return this.data.url;
-            // const queryString = this.data.url.substring(this.data.url.indexOf('?') + 1) || ''
-            // const query = new URLSearchParams(queryString);
-            // const videoId = query.get('v');
             const videoId = this.getVideoId(this.data.url);
             if (videoId)
                 return `https://www.youtube.com/embed/${videoId}`;
@@ -116,6 +116,19 @@ define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/
             var _a;
             let regex = /(youtu.*be.*)\/(watch\?v=|embed\/|v|shorts|)(.*?((?=[&#?])|$))/gm;
             return (_a = regex.exec(url)) === null || _a === void 0 ? void 0 : _a[3];
+        }
+        updateVideo() {
+            if (!this.videoEl) {
+                this.pnlVideo.clearInnerHTML();
+                if (this.ism3u8) {
+                    this.videoEl = this.$render("i-video", null);
+                }
+                else {
+                    this.videoEl = this.$render("i-iframe", { width: "100%", height: "100%", display: "flex" });
+                }
+                this.pnlVideo.append(this.videoEl);
+            }
+            this.videoEl.url = this.ism3u8 ? this.data.url : this.getUrl();
         }
         getTag() {
             return this.tag;
@@ -189,13 +202,6 @@ define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/
             };
             return schema;
         }
-        getThemeSchema(readOnly = false) {
-            const themeSchema = {
-                type: 'object',
-                properties: {}
-            };
-            return themeSchema;
-        }
         _getActions(settingSchema) {
             const actions = [
                 {
@@ -208,13 +214,13 @@ define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/
                                 oldData = Object.assign({}, this.data);
                                 if (userInputData === null || userInputData === void 0 ? void 0 : userInputData.url)
                                     this.data.url = userInputData.url;
-                                this.iframeElm.url = this.getUrl();
+                                this.updateVideo();
                                 if (builder === null || builder === void 0 ? void 0 : builder.setData)
                                     builder.setData(this.data);
                             },
                             undo: () => {
                                 this.data = Object.assign({}, oldData);
-                                this.iframeElm.url = this.getUrl();
+                                this.updateVideo();
                                 if (builder === null || builder === void 0 ? void 0 : builder.setData)
                                     builder.setData(this.data);
                             },
@@ -228,7 +234,7 @@ define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/
         }
         render() {
             return (this.$render("i-scom-dapp-container", { id: "dappContainer", showWalletNetwork: false, display: "block", maxWidth: "100%" },
-                this.$render("i-iframe", { id: "iframeElm", width: "100%", height: "100%", display: "flex" })));
+                this.$render("i-panel", { id: "pnlVideo", width: '100%', height: '100%' })));
         }
     };
     ScomVideo = __decorate([

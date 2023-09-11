@@ -50,8 +50,9 @@ declare module "@scom/scom-video" {
     }
     export default class ScomVideo extends Module {
         private data;
-        private iframeElm;
         private dappContainer;
+        private pnlVideo;
+        private videoEl;
         tag: any;
         defaultEdit?: boolean;
         validate?: () => boolean;
@@ -66,11 +67,13 @@ declare module "@scom/scom-video" {
         set showFooter(value: boolean);
         get showHeader(): boolean;
         set showHeader(value: boolean);
+        private get ism3u8();
         init(): Promise<void>;
         private getData;
         private setData;
         private getUrl;
-        getVideoId(url: string): string;
+        private getVideoId;
+        private updateVideo;
         private getTag;
         private setTag;
         getConfigurators(): ({
@@ -115,7 +118,6 @@ declare module "@scom/scom-video" {
             setTag: any;
         })[];
         private getPropertiesSchema;
-        private getThemeSchema;
         private _getActions;
         render(): any;
     }
