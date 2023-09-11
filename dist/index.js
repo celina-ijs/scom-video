@@ -33,8 +33,9 @@ define("@scom/scom-video/index.css.ts", ["require", "exports", "@ijstech/compone
 });
 define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/scom-video/data.json.ts", "@scom/scom-video/index.css.ts"], function (require, exports, components_2, data_json_1) {
     "use strict";
+    var ScomVideo_1;
     Object.defineProperty(exports, "__esModule", { value: true });
-    let ScomVideo = class ScomVideo extends components_2.Module {
+    let ScomVideo = ScomVideo_1 = class ScomVideo extends components_2.Module {
         constructor(parent, options) {
             super(parent, options);
             this.data = {
@@ -118,16 +119,18 @@ define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/
             return (_a = regex.exec(url)) === null || _a === void 0 ? void 0 : _a[3];
         }
         updateVideo() {
-            if (!this.videoEl) {
-                this.pnlVideo.clearInnerHTML();
-                if (this.ism3u8) {
-                    this.videoEl = this.$render("i-video", null);
+            if (this.ism3u8) {
+                if (!this.videoEl || !(this.videoEl instanceof ScomVideo_1)) {
+                    this.videoEl = this.$render("i-video", { width: '100%', height: '100%', display: 'block' });
                 }
-                else {
+            }
+            else {
+                if (!this.videoEl || !(this.videoEl instanceof components_2.Iframe)) {
                     this.videoEl = this.$render("i-iframe", { width: "100%", height: "100%", display: "flex" });
                 }
-                this.pnlVideo.append(this.videoEl);
             }
+            this.pnlVideo.clearInnerHTML();
+            this.pnlVideo.append(this.videoEl);
             this.videoEl.url = this.ism3u8 ? this.data.url : this.getUrl();
         }
         getTag() {
@@ -237,7 +240,7 @@ define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/
                 this.$render("i-panel", { id: "pnlVideo", width: '100%', height: '100%' })));
         }
     };
-    ScomVideo = __decorate([
+    ScomVideo = ScomVideo_1 = __decorate([
         components_2.customModule,
         (0, components_2.customElements)('i-scom-video')
     ], ScomVideo);

@@ -5,7 +5,8 @@ import {
   Container,
   ControlElement,
   customElements,
-  Panel
+  Panel,
+  Iframe
 } from '@ijstech/components'
 import { IData } from './interface'
 import ScomDappContainer from '@scom/scom-dapp-container'
@@ -126,15 +127,17 @@ export default class ScomVideo extends Module {
   }
 
   private updateVideo() {
-    if (!this.videoEl) {
-      this.pnlVideo.clearInnerHTML()
-      if (this.ism3u8) {
-        this.videoEl = <i-video></i-video>
-      } else {
+    if (this.ism3u8) {
+      if (!this.videoEl || !(this.videoEl instanceof ScomVideo)) {
+        this.videoEl = <i-video width={'100%'} height={'100%'} display='block'></i-video>
+      }
+    } else {
+      if (!this.videoEl || !(this.videoEl instanceof Iframe)) {
         this.videoEl = <i-iframe width="100%" height="100%" display="flex"></i-iframe>
       }
-      this.pnlVideo.append(this.videoEl)
     }
+    this.pnlVideo.clearInnerHTML()
+    this.pnlVideo.append(this.videoEl)
     this.videoEl.url = this.ism3u8 ? this.data.url : this.getUrl()
   }
 
