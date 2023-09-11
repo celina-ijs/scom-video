@@ -66,7 +66,7 @@ declare module "@scom/scom-video" {
         set showFooter(value: boolean);
         get showHeader(): boolean;
         set showHeader(value: boolean);
-        init(): void;
+        init(): Promise<void>;
         private getData;
         private setData;
         private getUrl;

@@ -8,8 +8,6 @@ import {
   Iframe
 } from '@ijstech/components'
 import { IData } from './interface'
-import {} from '@ijstech/eth-contract'
-import {} from '@ijstech/eth-wallet'
 import ScomDappContainer from '@scom/scom-dapp-container'
 import dataJson from './data.json'
 import './index.css'
@@ -60,7 +58,8 @@ export default class ScomVideo extends Module {
     return this.data.url ?? '';
   }
   set url(value: string) {
-    this.setData({url: value});
+    this.data.url = value ?? '';
+    this.iframeElm.url = this.getUrl()
   }
 
   get showFooter() {
@@ -79,16 +78,17 @@ export default class ScomVideo extends Module {
     if (this.dappContainer) this.dappContainer.showHeader = this.showHeader;
   }
   
-  init() {
+  async init() {
     super.init()
     const width = this.getAttribute('width', true);
     const height = this.getAttribute('height', true);
     this.setTag({width: width ? this.width : '480px', height: height ? this.height : '270px'});
     const lazyLoad = this.getAttribute('lazyLoad', true, false);
     if (!lazyLoad) {
-      this.url = this.getAttribute('url', true);
-      this.showHeader = this.getAttribute('showHeader', true, false)
-      this.showFooter = this.getAttribute('showFooter', true, false)
+      const url = this.getAttribute('url', true);
+      const showHeader = this.getAttribute('showHeader', true, false);
+      const showFooter = this.getAttribute('showFooter', true, false);
+      await this.setData({ url, showFooter, showHeader });
     }
   }
 
@@ -100,7 +100,7 @@ export default class ScomVideo extends Module {
     this.data = value
     this.iframeElm.url = this.getUrl()
     if (this.dappContainer) {
-      this.dappContainer.setData({
+      await this.dappContainer.setData({
         showHeader: this.showHeader,
         showFooter: this.showFooter
       })
@@ -144,8 +144,7 @@ export default class ScomVideo extends Module {
         target: 'Builders',
         getActions: () => {
           const propertiesSchema = this.getPropertiesSchema();
-          const themeSchema = this.getThemeSchema();
-          return this._getActions(propertiesSchema, themeSchema);
+          return this._getActions(propertiesSchema);
         },
         getData: this.getData.bind(this),
         setData: async (data: IData) => {
@@ -160,8 +159,7 @@ export default class ScomVideo extends Module {
         target: 'Embedders',
         getActions: () => {
           const propertiesSchema = this.getPropertiesSchema();
-          const themeSchema = this.getThemeSchema(true);
-          return this._getActions(propertiesSchema, themeSchema);
+          return this._getActions(propertiesSchema);
         },
         getLinkParams: () => {
           const data = this.data || {};
@@ -205,21 +203,12 @@ export default class ScomVideo extends Module {
   private getThemeSchema(readOnly = false) {
     const themeSchema: IDataSchema = {
       type: 'object',
-      properties: {
-        width: {
-          type: 'string',
-          readOnly
-        },
-        height: {
-          type: 'string',
-          readOnly
-        }
-      }
+      properties: {}
     }
     return themeSchema;
   }
 
-  private _getActions(settingSchema: IDataSchema, themeSchema: IDataSchema) {
+  private _getActions(settingSchema: IDataSchema) {
     const actions = [
       {
         name: 'Edit',
