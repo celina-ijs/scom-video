@@ -54,35 +54,15 @@ define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/
             return self;
         }
         get url() {
-            var _a;
-            return (_a = this.data.url) !== null && _a !== void 0 ? _a : '';
+            return this.data.url ?? '';
         }
         set url(value) {
-            this.data.url = value !== null && value !== void 0 ? value : '';
+            this.data.url = value ?? '';
             this.updateVideo();
         }
-        get showFooter() {
-            var _a;
-            return (_a = this.data.showFooter) !== null && _a !== void 0 ? _a : false;
-        }
-        set showFooter(value) {
-            this.data.showFooter = value;
-            if (this.dappContainer)
-                this.dappContainer.showFooter = this.showFooter;
-        }
-        get showHeader() {
-            var _a;
-            return (_a = this.data.showHeader) !== null && _a !== void 0 ? _a : false;
-        }
-        set showHeader(value) {
-            this.data.showHeader = value;
-            if (this.dappContainer)
-                this.dappContainer.showHeader = this.showHeader;
-        }
         get ism3u8() {
-            var _a;
             const regex = /.*\.m3u8$/gi;
-            return regex.test(((_a = this.data) === null || _a === void 0 ? void 0 : _a.url) || '');
+            return regex.test(this.data?.url || '');
         }
         async init() {
             super.init();
@@ -103,12 +83,6 @@ define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/
         async setData(value) {
             this.data = value;
             this.updateVideo();
-            if (this.dappContainer) {
-                await this.dappContainer.setData({
-                    showHeader: this.showHeader,
-                    showFooter: this.showFooter
-                });
-            }
         }
         getUrl() {
             if (!this.data.url)
@@ -119,14 +93,18 @@ define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/
             return this.data.url;
         }
         getVideoId(url) {
-            var _a;
             let regex = /(youtu.*be.*)\/(watch\?v=|embed\/|v|shorts|)(.*?((?=[&#?])|$))/gm;
-            return (_a = regex.exec(url)) === null || _a === void 0 ? void 0 : _a[3];
+            return regex.exec(url)?.[3];
         }
         updateVideo() {
-            if (this.ism3u8) {
+            if (this.data.url.endsWith('.mp4')) {
                 if (!this.videoEl || !(this.videoEl instanceof ScomVideo_1)) {
                     this.videoEl = this.$render("i-video", { width: '100%', height: '100%', display: 'block' });
+                }
+            }
+            else if (this.ism3u8) {
+                if (!this.videoEl || !(this.videoEl instanceof ScomVideo_1)) {
+                    this.videoEl = this.$render("i-video", { isStreaming: true, width: '100%', height: '100%', display: 'block' });
                 }
             }
             else {
@@ -142,14 +120,7 @@ define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/
             return this.tag;
         }
         async setTag(value) {
-            var _a, _b;
             this.tag = value;
-            if (this.dappContainer) {
-                if ((_a = this.tag) === null || _a === void 0 ? void 0 : _a.width)
-                    this.dappContainer.width = this.tag.width;
-                if ((_b = this.tag) === null || _b === void 0 ? void 0 : _b.height)
-                    this.dappContainer.height = this.tag.height;
-            }
         }
         getConfigurators() {
             const self = this;
@@ -164,7 +135,7 @@ define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/
                     getData: this.getData.bind(this),
                     setData: async (data) => {
                         const defaultData = data_json_1.default.defaultBuilderData;
-                        await this.setData(Object.assign(Object.assign({}, defaultData), data));
+                        await this.setData({ ...defaultData, ...data });
                     },
                     getTag: this.getTag.bind(this),
                     setTag: this.setTag.bind(this)
@@ -187,7 +158,10 @@ define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/
                             const utf8String = decodeURIComponent(params.data);
                             const decodedString = window.atob(utf8String);
                             const newData = JSON.parse(decodedString);
-                            let resultingData = Object.assign(Object.assign({}, self.data), newData);
+                            let resultingData = {
+                                ...self.data,
+                                ...newData
+                            };
                             await this.setData(resultingData);
                         }
                     },
@@ -219,17 +193,17 @@ define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/
                         let oldData = { url: '' };
                         return {
                             execute: () => {
-                                oldData = Object.assign({}, this.data);
-                                if (userInputData === null || userInputData === void 0 ? void 0 : userInputData.url)
+                                oldData = { ...this.data };
+                                if (userInputData?.url)
                                     this.data.url = userInputData.url;
                                 this.updateVideo();
-                                if (builder === null || builder === void 0 ? void 0 : builder.setData)
+                                if (builder?.setData)
                                     builder.setData(this.data);
                             },
                             undo: () => {
-                                this.data = Object.assign({}, oldData);
+                                this.data = { ...oldData };
                                 this.updateVideo();
-                                if (builder === null || builder === void 0 ? void 0 : builder.setData)
+                                if (builder?.setData)
                                     builder.setData(this.data);
                             },
                             redo: () => { }
@@ -241,8 +215,7 @@ define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/
             return actions;
         }
         render() {
-            return (this.$render("i-scom-dapp-container", { id: "dappContainer", showWalletNetwork: false, display: "block", maxWidth: "100%" },
-                this.$render("i-panel", { id: "pnlVideo", width: '100%', height: '100%' })));
+            return (this.$render("i-panel", { id: "pnlVideo", width: '100%', height: '100%' }));
         }
     };
     ScomVideo = ScomVideo_1 = __decorate([

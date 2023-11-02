@@ -9,15 +9,12 @@ import {
   Iframe
 } from '@ijstech/components'
 import { IData } from './interface'
-import ScomDappContainer from '@scom/scom-dapp-container'
 import dataJson from './data.json'
 import './index.css'
 
 interface ScomVideoElement extends ControlElement {
   lazyLoad?: boolean;
   url: string;
-  showHeader?: boolean;
-  showFooter?: boolean;
 }
 
 declare global {
@@ -34,7 +31,6 @@ export default class ScomVideo extends Module {
   private data: IData = {
     url: ''
   };
-  private dappContainer: ScomDappContainer
   private pnlVideo: Panel
   private videoEl: any
 
@@ -64,22 +60,6 @@ export default class ScomVideo extends Module {
     this.updateVideo();
   }
 
-  get showFooter() {
-    return this.data.showFooter ?? false
-  }
-  set showFooter(value: boolean) {
-    this.data.showFooter = value
-    if (this.dappContainer) this.dappContainer.showFooter = this.showFooter;
-  }
-
-  get showHeader() {
-    return this.data.showHeader ?? false
-  }
-  set showHeader(value: boolean) {
-    this.data.showHeader = value
-    if (this.dappContainer) this.dappContainer.showHeader = this.showHeader;
-  }
-  
   private get ism3u8() {
     const regex = /.*\.m3u8$/gi
     return regex.test(this.data?.url || '')
@@ -106,12 +86,6 @@ export default class ScomVideo extends Module {
   private async setData(value: IData) {
     this.data = value
     this.updateVideo()
-    if (this.dappContainer) {
-      await this.dappContainer.setData({
-        showHeader: this.showHeader,
-        showFooter: this.showFooter
-      })
-    }
   }
 
   private getUrl() {
@@ -127,11 +101,17 @@ export default class ScomVideo extends Module {
   }
 
   private updateVideo() {
-    if (this.ism3u8) {
+    if (this.data.url.endsWith('.mp4')) {
       if (!this.videoEl || !(this.videoEl instanceof ScomVideo)) {
         this.videoEl = <i-video width={'100%'} height={'100%'} display='block'></i-video>
       }
-    } else {
+    } 
+    else if (this.ism3u8) {
+      if (!this.videoEl || !(this.videoEl instanceof ScomVideo)) {
+        this.videoEl = <i-video isStreaming={true} width={'100%'} height={'100%'} display='block'></i-video>
+      }
+    } 
+    else {
       if (!this.videoEl || !(this.videoEl instanceof Iframe)) {
         this.videoEl = <i-iframe width="100%" height="100%" display="flex"></i-iframe>
       }
@@ -147,10 +127,6 @@ export default class ScomVideo extends Module {
 
   private async setTag(value: any) {
     this.tag = value;
-    if (this.dappContainer) {
-      if (this.tag?.width) this.dappContainer.width = this.tag.width;
-      if (this.tag?.height) this.dappContainer.height = this.tag.height;
-    }
   }
 
   getConfigurators() {
@@ -247,9 +223,7 @@ export default class ScomVideo extends Module {
 
   render() {
     return (
-      <i-scom-dapp-container id="dappContainer" showWalletNetwork={false} display="block" maxWidth="100%">
-        <i-panel id="pnlVideo" width={'100%'} height={'100%'}/>
-      </i-scom-dapp-container>
+      <i-panel id="pnlVideo" width={'100%'} height={'100%'}></i-panel>
     )
   }
 }

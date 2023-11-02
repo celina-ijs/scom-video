@@ -38,8 +38,6 @@ declare module "@scom/scom-video" {
     interface ScomVideoElement extends ControlElement {
         lazyLoad?: boolean;
         url: string;
-        showHeader?: boolean;
-        showFooter?: boolean;
     }
     global {
         namespace JSX {
@@ -50,7 +48,6 @@ declare module "@scom/scom-video" {
     }
     export default class ScomVideo extends Module {
         private data;
-        private dappContainer;
         private pnlVideo;
         private videoEl;
         tag: any;
@@ -63,10 +60,6 @@ declare module "@scom/scom-video" {
         static create(options?: ScomVideoElement, parent?: Container): Promise<ScomVideo>;
         get url(): string;
         set url(value: string);
-        get showFooter(): boolean;
-        set showFooter(value: boolean);
-        get showHeader(): boolean;
-        set showHeader(value: boolean);
         private get ism3u8();
         init(): Promise<void>;
         private getData;
