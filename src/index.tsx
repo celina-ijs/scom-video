@@ -136,8 +136,7 @@ export default class ScomVideo extends Module {
         name: 'Builder Configurator',
         target: 'Builders',
         getActions: () => {
-          const propertiesSchema = this.getPropertiesSchema();
-          return this._getActions(propertiesSchema);
+          return this._getActions();
         },
         getData: this.getData.bind(this),
         setData: async (data: IData) => {
@@ -151,8 +150,7 @@ export default class ScomVideo extends Module {
         name: 'Emdedder Configurator',
         target: 'Embedders',
         getActions: () => {
-          const propertiesSchema = this.getPropertiesSchema();
-          return this._getActions(propertiesSchema);
+          return this._getActions();
         },
         getLinkParams: () => {
           const data = this.data || {};
@@ -176,8 +174,48 @@ export default class ScomVideo extends Module {
         setData: this.setData.bind(this),
         getTag: this.getTag.bind(this),
         setTag: this.setTag.bind(this)
+      },
+      {
+        name: 'Editor',
+        target: 'Editor',
+        getActions: () => {
+          return this._getActions()
+        },
+        getLink: this.getLink.bind(this),
+        setLink: (value: string) => {
+          const utf8String = decodeURIComponent(value);
+          const decodedString = window.atob(utf8String);
+          const newData = JSON.parse(decodedString);
+          let resultingData = {
+            ...self.data,
+            ...(newData.properties || {})
+          };
+          this.setData(resultingData);
+        },
+        setData: this.setData.bind(this),
+        getData: this.getData.bind(this),
+        getTag: this.getTag.bind(this),
+        setTag: this.setTag.bind(this)
       }
     ]
+  }
+
+  private getLink() {
+    const encodedWidgetDataString  = window.btoa(JSON.stringify(this._getWidgetData()));
+    const loaderUrl = `https://ipfs.scom.dev/ipfs/bafybeia442nl6djz7qipnfk5dxu26pgr2xgpar7znvt3aih2k6nxk7sib4`;
+    return `${loaderUrl}?data=${encodedWidgetDataString}`;
+  }
+
+  private _getWidgetData() {
+    return {
+      "module": {
+        "name": "@scom/scom-video",
+        "localPath": "scom-video"
+      },
+      "properties": {
+        ...(this.data || {})
+      }
+    }
   }
 
   private getPropertiesSchema() {
@@ -193,7 +231,8 @@ export default class ScomVideo extends Module {
     return schema;
   }
 
-  private _getActions(settingSchema: IDataSchema) {
+  private _getActions() {
+    const propertiesSchema = this.getPropertiesSchema();
     const actions = [
       {
         name: 'Edit',
@@ -215,7 +254,7 @@ export default class ScomVideo extends Module {
             redo: () => {}
           }
         },
-        userInputDataSchema: settingSchema as IDataSchema
+        userInputDataSchema: propertiesSchema as IDataSchema
       }
     ]
     return actions
