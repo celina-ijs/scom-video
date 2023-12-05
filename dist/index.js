@@ -66,6 +66,8 @@ define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/
         }
         async init() {
             super.init();
+            if (!this.onClick)
+                this.onClick = (target, event) => event.stopPropagation();
             const width = this.getAttribute('width', true);
             const height = this.getAttribute('height', true);
             this.setTag({ width: width ? this.width : '480px', height: height ? this.height : '270px' });
