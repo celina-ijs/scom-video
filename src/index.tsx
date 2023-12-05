@@ -6,7 +6,8 @@ import {
   ControlElement,
   customElements,
   Panel,
-  Iframe
+  Iframe,
+  Control
 } from '@ijstech/components'
 import { IData } from './interface'
 import dataJson from './data.json'
@@ -66,7 +67,8 @@ export default class ScomVideo extends Module {
   }
 
   async init() {
-    super.init()
+    super.init();
+    if (!this.onClick) this.onClick = (target: Control, event: Event) => event.stopPropagation();
     const width = this.getAttribute('width', true);
     const height = this.getAttribute('height', true);
     this.setTag({width: width ? this.width : '480px', height: height ? this.height : '270px'});
