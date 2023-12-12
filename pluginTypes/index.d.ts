@@ -88,8 +88,6 @@ declare module "@scom/scom-video" {
             setTag: any;
             getLinkParams?: undefined;
             setLinkParams?: undefined;
-            getLink?: undefined;
-            setLink?: undefined;
         } | {
             name: string;
             target: string;
@@ -111,32 +109,7 @@ declare module "@scom/scom-video" {
             setData: any;
             getTag: any;
             setTag: any;
-            getLink?: undefined;
-            setLink?: undefined;
-        } | {
-            name: string;
-            target: string;
-            getActions: () => {
-                name: string;
-                icon: string;
-                command: (builder: any, userInputData: any) => {
-                    execute: () => void;
-                    undo: () => void;
-                    redo: () => void;
-                };
-                userInputDataSchema: IDataSchema;
-            }[];
-            getLink: any;
-            setLink: (value: string) => void;
-            setData: any;
-            getData: any;
-            getTag: any;
-            setTag: any;
-            getLinkParams?: undefined;
-            setLinkParams?: undefined;
         })[];
-        private getLink;
-        private _getWidgetData;
         private getPropertiesSchema;
         private _getActions;
         render(): any;
