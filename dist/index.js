@@ -32,6 +32,12 @@ define("@scom/scom-video/index.css.ts", ["require", "exports", "@ijstech/compone
                 top: '50%',
                 left: '50%',
                 transform: 'translate(-50%, -50%)'
+            },
+            'i-iframe': {
+                aspectRatio: '16/9'
+            },
+            'i-video video': {
+                aspectRatio: '16/9'
             }
         }
     });
