@@ -117,7 +117,7 @@ define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/
             }
             else {
                 if (!this.videoEl || !(this.videoEl instanceof components_2.Iframe)) {
-                    this.videoEl = this.$render("i-iframe", { width: "100%", height: "100%", display: "flex" });
+                    this.videoEl = this.$render("i-iframe", { width: "100%", height: "100%", display: "flex", allowFullscreen: true });
                 }
             }
             this.pnlVideo.clearInnerHTML();
