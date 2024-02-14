@@ -115,7 +115,7 @@ export default class ScomVideo extends Module {
     } 
     else {
       if (!this.videoEl || !(this.videoEl instanceof Iframe)) {
-        this.videoEl = <i-iframe width="100%" height="100%" display="flex"></i-iframe>
+        this.videoEl = <i-iframe width="100%" height="100%" display="flex" allowFullscreen={true}></i-iframe>
       }
     }
     this.pnlVideo.clearInnerHTML()

@@ -32,6 +32,12 @@ define("@scom/scom-video/index.css.ts", ["require", "exports", "@ijstech/compone
                 top: '50%',
                 left: '50%',
                 transform: 'translate(-50%, -50%)'
+            },
+            'i-iframe': {
+                aspectRatio: '16/9'
+            },
+            'i-video video': {
+                aspectRatio: '16/9'
             }
         }
     });
@@ -112,7 +118,7 @@ define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/
             }
             else {
                 if (!this.videoEl || !(this.videoEl instanceof components_2.Iframe)) {
-                    this.videoEl = this.$render("i-iframe", { width: "100%", height: "100%", display: "flex" });
+                    this.videoEl = this.$render("i-iframe", { width: "100%", height: "100%", display: "flex", allowFullscreen: true });
                 }
             }
             this.pnlVideo.clearInnerHTML();
