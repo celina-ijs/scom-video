@@ -102,11 +102,11 @@ define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/
             return this.data.url;
         }
         getVideoId(url) {
-            let regex = /(youtu.*be.*)\/(watch\?v=|embed\/|v|shorts|)(.*?((?=[&#?])|$))/gm;
+            let regex = /(youtu.*be.*)\/(watch\?v=|watch\?.+&v=|live\/|shorts\/|embed\/|v\/|)(.*?((?=[&#?])|$))/gm;
             return regex.exec(url)?.[3];
         }
         updateVideo() {
-            if (this.data.url.endsWith('.mp4')) {
+            if (this.data.url.endsWith('.mp4') || this.data.url.endsWith('.mov')) {
                 if (!this.videoEl || !(this.videoEl instanceof ScomVideo_1)) {
                     this.videoEl = this.$render("i-video", { width: '100%', height: '100%', display: 'block' });
                 }
