@@ -98,7 +98,7 @@ export default class ScomVideo extends Module {
   }
   
   private getVideoId(url: string) {
-    let regex = /(youtu.*be.*)\/(watch\?v=|embed\/|v|shorts|)(.*?((?=[&#?])|$))/gm;
+    let regex = /(youtu.*be.*)\/(watch\?v=|watch\?.+&v=|live\/|shorts\/|embed\/|v\/|)(.*?((?=[&#?])|$))/gm;
     return regex.exec(url)?.[3];
   }
 

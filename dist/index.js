@@ -102,7 +102,7 @@ define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/
             return this.data.url;
         }
         getVideoId(url) {
-            let regex = /(youtu.*be.*)\/(watch\?v=|embed\/|v|shorts|)(.*?((?=[&#?])|$))/gm;
+            let regex = /(youtu.*be.*)\/(watch\?v=|watch\?.+&v=|live\/|shorts\/|embed\/|v\/|)(.*?((?=[&#?])|$))/gm;
             return regex.exec(url)?.[3];
         }
         updateVideo() {
