@@ -99,7 +99,7 @@ export default class ScomVideo extends Module {
   
   private getVideoId(url: string) {
     let regex = /(youtu.*be.*)\/(watch\?v=|watch\?.+&v=|live\/|shorts\/|embed\/|v\/|)(.*?((?=[&#?])|$))/gm;
-    return regex.exec(url)?.[3];
+    return regex.exec(url)?.[3] || url;
   }
 
   private updateVideo() {
@@ -131,7 +131,7 @@ export default class ScomVideo extends Module {
     this.tag = value;
   }
 
-  getConfigurators() {
+  getConfigurators(type?:'defaultLinkYoutube'|'defaultLinkM3u8'|'defaultLinkEmpty') {
     const self = this;
     return [
       {
@@ -142,7 +142,15 @@ export default class ScomVideo extends Module {
         },
         getData: this.getData.bind(this),
         setData: async (data: IData) => {
-          const defaultData = dataJson.defaultBuilderData as any;
+          let defaultData = dataJson.defaultBuilderData3;
+          switch (type){
+            case 'defaultLinkYoutube':
+              defaultData = dataJson.defaultBuilderData;
+              break;
+            case 'defaultLinkM3u8':
+              defaultData = dataJson.defaultBuilderData2;
+              break;
+          }
           await this.setData({...defaultData, ...data})
         },
         getTag: this.getTag.bind(this),
@@ -200,7 +208,8 @@ export default class ScomVideo extends Module {
       required: ["url"],
       properties: {
         url: {
-          type: "string"
+          type: "string",
+          tooltip: "Examples:\nYouTube full link: https://www.youtube.com/watch?v=dQw4w9WgXcQ,\nnYouTube video ID: dQw4w9WgXcQ\n",
         }
       }
     };

@@ -13,7 +13,6 @@
   },
   "dependencies": {
     "@scom/dapp": "*",
-    "@scom/scom-dapp-container": "*",
     "@scom/scom-video": "*"
   },
   "menus": [

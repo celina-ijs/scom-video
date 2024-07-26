@@ -25,6 +25,12 @@ declare module "@scom/scom-video/data.json.ts" {
         defaultBuilderData: {
             url: string;
         };
+        defaultBuilderData2: {
+            url: string;
+        };
+        defaultBuilderData3: {
+            url: string;
+        };
     };
     export default _default;
 }
@@ -69,7 +75,7 @@ declare module "@scom/scom-video" {
         private updateVideo;
         private getTag;
         private setTag;
-        getConfigurators(): ({
+        getConfigurators(type: 'defaultLinkYoutube' | 'defaultLinkM3u8' | 'defaultLinkEmpty'): ({
             name: string;
             target: string;
             getActions: () => {

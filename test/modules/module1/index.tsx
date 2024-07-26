@@ -13,22 +13,20 @@ export default class Module1 extends Module {
         super.init();
         this.videoElm = await ScomVideo.create({
             id: 'video2',
-            url: 'https://www.youtube.com/embed/Wlf1T5nrO50'
+            url: 'dQw4w9WgXcQ'
         });
         this.mainStack.appendChild(this.videoElm);
     }
 
     render() {
         return <i-panel>
-            <i-hstack id="mainStack" margin={{top: '1rem', left: '1rem'}} gap="2rem">
-               <i-scom-video
-                id="video1"
-                url='modules/module1/data/index1.m3u8'
-                width={500}
-                height={300}
-                showHeader={false}
-                showFooter={false}
-               ></i-scom-video>
+            <i-hstack id="mainStack" margin={{ top: '1rem', left: '1rem' }} gap="2rem">
+                <i-scom-video
+                    id="video1"
+                    url='dQw4w9WgXcQ'
+                    width={500}
+                    height={300}
+                ></i-scom-video>
             </i-hstack>
         </i-panel>
     }

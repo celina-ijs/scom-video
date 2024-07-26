@@ -15,8 +15,14 @@ define("@scom/scom-video/data.json.ts", ["require", "exports"], function (requir
     exports.default = {
         "ipfsGatewayUrl": "https://ipfs.scom.dev/ipfs/",
         "defaultBuilderData": {
-            "url": "https://www.youtube.com/embed/Wlf1T5nrO50"
-        }
+            "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+        },
+        "defaultBuilderData2": {
+            "url": ""
+        },
+        "defaultBuilderData3": {
+            "url": ""
+        },
     };
 });
 define("@scom/scom-video/index.css.ts", ["require", "exports", "@ijstech/components"], function (require, exports, components_1) {
@@ -103,7 +109,7 @@ define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/
         }
         getVideoId(url) {
             let regex = /(youtu.*be.*)\/(watch\?v=|watch\?.+&v=|live\/|shorts\/|embed\/|v\/|)(.*?((?=[&#?])|$))/gm;
-            return regex.exec(url)?.[3];
+            return regex.exec(url)?.[3] || url;
         }
         updateVideo() {
             if (this.data.url.endsWith('.mp4') || this.data.url.endsWith('.mov')) {
@@ -131,7 +137,7 @@ define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/
         async setTag(value) {
             this.tag = value;
         }
-        getConfigurators() {
+        getConfigurators(type) {
             const self = this;
             return [
                 {
@@ -142,7 +148,15 @@ define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/
                     },
                     getData: this.getData.bind(this),
                     setData: async (data) => {
-                        const defaultData = data_json_1.default.defaultBuilderData;
+                        let defaultData = data_json_1.default.defaultBuilderData3;
+                        switch (type) {
+                            case 'defaultLinkYoutube':
+                                defaultData = data_json_1.default.defaultBuilderData;
+                                break;
+                            case 'defaultLinkM3u8':
+                                defaultData = data_json_1.default.defaultBuilderData2;
+                                break;
+                        }
                         await this.setData({ ...defaultData, ...data });
                     },
                     getTag: this.getTag.bind(this),
@@ -199,7 +213,8 @@ define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/
                 required: ["url"],
                 properties: {
                     url: {
-                        type: "string"
+                        type: "string",
+                        tooltip: "Examples:\nYouTube full link: https://www.youtube.com/watch?v=dQw4w9WgXcQ,\nnYouTube video ID: dQw4w9WgXcQ\n",
                     }
                 }
             };
