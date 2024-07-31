@@ -75,9 +75,7 @@ export default class ScomVideo extends Module {
     const lazyLoad = this.getAttribute('lazyLoad', true, false);
     if (!lazyLoad) {
       const url = this.getAttribute('url', true);
-      const showHeader = this.getAttribute('showHeader', true, false);
-      const showFooter = this.getAttribute('showFooter', true, false);
-      if (url) await this.setData({ url, showFooter, showHeader });
+      if (url) await this.setData({ url });
     }
   }
 
@@ -221,7 +219,7 @@ export default class ScomVideo extends Module {
       properties: {
         url: {
           type: "string",
-          tooltip: "Examples:\nYouTube full link: https://www.youtube.com/watch?v=dQw4w9WgXcQ,\nYouTube video ID: dQw4w9WgXcQ\nmp4 file: https://static.flot.ai/file/karavideo/happy-cat.mp4",
+          tooltip: "Examples:<br>YouTube full link: https://www.youtube.com/watch?v=dQw4w9WgXcQ,<br>YouTube video ID: dQw4w9WgXcQ<br>mp4 file: https://static.flot.ai/file/karavideo/happy-cat.mp4",
         }
       }
     };
