@@ -14,8 +14,6 @@ declare module "@scom/scom-video/interface.ts" {
     }
     export interface IData {
         url: string;
-        showHeader?: boolean;
-        showFooter?: boolean;
     }
 }
 /// <amd-module name="@scom/scom-video/data.json.ts" />

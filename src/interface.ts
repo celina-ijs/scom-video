@@ -15,6 +15,4 @@ export interface IPageBlockAction {
 
 export interface IData {
 	url: string;
-  showHeader?: boolean;
-  showFooter?: boolean;
 }
