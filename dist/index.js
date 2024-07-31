@@ -18,9 +18,12 @@ define("@scom/scom-video/data.json.ts", ["require", "exports"], function (requir
             "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
         },
         "defaultBuilderData2": {
-            "url": ""
+            "url": "https://static.flot.ai/file/karavideo/happy-cat.mp4"
         },
         "defaultBuilderData3": {
+            "url": ""
+        },
+        "defaultBuilderData4": {
             "url": ""
         },
     };
@@ -154,13 +157,16 @@ define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/
                     },
                     getData: this.getData.bind(this),
                     setData: async (data) => {
-                        let defaultData = data_json_1.default.defaultBuilderData3;
+                        let defaultData = data_json_1.default.defaultBuilderData4; //empty
                         switch (type) {
                             case 'defaultLinkYoutube':
                                 defaultData = data_json_1.default.defaultBuilderData;
                                 break;
-                            case 'defaultLinkM3u8':
+                            case 'defaultLinkMp4':
                                 defaultData = data_json_1.default.defaultBuilderData2;
+                                break;
+                            case 'defaultLinkM3u8':
+                                defaultData = data_json_1.default.defaultBuilderData3;
                                 break;
                         }
                         await this.setData({ ...defaultData, ...data });
