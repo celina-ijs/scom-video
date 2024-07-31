@@ -106,21 +106,30 @@ export default class ScomVideo extends Module {
     if (this.data.url.endsWith('.mp4') || this.data.url.endsWith('.mov')) {
       if (!this.videoEl || !(this.videoEl instanceof ScomVideo)) {
         this.videoEl = <i-video width={'100%'} height={'100%'} display='block'></i-video>
+
+        this.pnlVideo.clearInnerHTML()
+        this.pnlVideo.append(this.videoEl)
+        this.videoEl.url = this.data.url;
       }
     } 
     else if (this.ism3u8) {
       if (!this.videoEl || !(this.videoEl instanceof ScomVideo)) {
         this.videoEl = <i-video isStreaming={true} width={'100%'} height={'100%'} display='block'></i-video>
+
+        this.pnlVideo.clearInnerHTML()
+        this.pnlVideo.append(this.videoEl)
+        this.videoEl.url = this.data.url;
       }
     } 
-    else {
-      if (!this.videoEl || !(this.videoEl instanceof Iframe)) {
+    else {// should be YouTube
+      if (!this.videoEl || !(this.videoEl instanceof Iframe)) { 
         this.videoEl = <i-iframe width="100%" height="100%" display="flex" allowFullscreen={true}></i-iframe>
+
+        this.pnlVideo.clearInnerHTML()
+        this.pnlVideo.append(this.videoEl)
+        this.videoEl.url = this.getUrl();
       }
     }
-    this.pnlVideo.clearInnerHTML()
-    this.pnlVideo.append(this.videoEl)
-    this.videoEl.url = this.ism3u8 ? this.data.url : this.getUrl()
   }
 
   private getTag() {
@@ -209,7 +218,7 @@ export default class ScomVideo extends Module {
       properties: {
         url: {
           type: "string",
-          tooltip: "Examples:\nYouTube full link: https://www.youtube.com/watch?v=dQw4w9WgXcQ,\nnYouTube video ID: dQw4w9WgXcQ\n",
+          tooltip: "Examples:\nYouTube full link: https://www.youtube.com/watch?v=dQw4w9WgXcQ,\nYouTube video ID: dQw4w9WgXcQ\nmp4 file: https://static.flot.ai/file/karavideo/happy-cat.mp4",
         }
       }
     };

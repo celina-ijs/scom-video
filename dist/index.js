@@ -115,21 +115,27 @@ define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/
             if (this.data.url.endsWith('.mp4') || this.data.url.endsWith('.mov')) {
                 if (!this.videoEl || !(this.videoEl instanceof ScomVideo_1)) {
                     this.videoEl = this.$render("i-video", { width: '100%', height: '100%', display: 'block' });
+                    this.pnlVideo.clearInnerHTML();
+                    this.pnlVideo.append(this.videoEl);
+                    this.videoEl.url = this.data.url;
                 }
             }
             else if (this.ism3u8) {
                 if (!this.videoEl || !(this.videoEl instanceof ScomVideo_1)) {
                     this.videoEl = this.$render("i-video", { isStreaming: true, width: '100%', height: '100%', display: 'block' });
+                    this.pnlVideo.clearInnerHTML();
+                    this.pnlVideo.append(this.videoEl);
+                    this.videoEl.url = this.data.url;
                 }
             }
-            else {
+            else { // should be YouTube
                 if (!this.videoEl || !(this.videoEl instanceof components_2.Iframe)) {
                     this.videoEl = this.$render("i-iframe", { width: "100%", height: "100%", display: "flex", allowFullscreen: true });
+                    this.pnlVideo.clearInnerHTML();
+                    this.pnlVideo.append(this.videoEl);
+                    this.videoEl.url = this.getUrl();
                 }
             }
-            this.pnlVideo.clearInnerHTML();
-            this.pnlVideo.append(this.videoEl);
-            this.videoEl.url = this.ism3u8 ? this.data.url : this.getUrl();
         }
         getTag() {
             return this.tag;
@@ -214,7 +220,7 @@ define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/
                 properties: {
                     url: {
                         type: "string",
-                        tooltip: "Examples:\nYouTube full link: https://www.youtube.com/watch?v=dQw4w9WgXcQ,\nnYouTube video ID: dQw4w9WgXcQ\n",
+                        tooltip: "Examples:\nYouTube full link: https://www.youtube.com/watch?v=dQw4w9WgXcQ,\nYouTube video ID: dQw4w9WgXcQ\nmp4 file: https://static.flot.ai/file/karavideo/happy-cat.mp4",
                     }
                 }
             };

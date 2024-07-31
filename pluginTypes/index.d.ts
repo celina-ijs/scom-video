@@ -75,7 +75,7 @@ declare module "@scom/scom-video" {
         private updateVideo;
         private getTag;
         private setTag;
-        getConfigurators(type: 'defaultLinkYoutube' | 'defaultLinkM3u8' | 'defaultLinkEmpty'): ({
+        getConfigurators(type?: 'defaultLinkYoutube' | 'defaultLinkM3u8' | 'defaultLinkEmpty'): ({
             name: string;
             target: string;
             getActions: () => {
