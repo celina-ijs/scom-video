@@ -47,7 +47,7 @@ export default class ScomVideo extends Module {
     super(parent, options);
   }
 
-  static async create(options?: ScomVideoElement, parent?: Container){
+  static async create(options?: ScomVideoElement, parent?: Container) {
     let self = new this(parent, options);
     await self.ready();
     return self;
@@ -71,7 +71,7 @@ export default class ScomVideo extends Module {
     if (!this.onClick) this.onClick = (target: Control, event: Event) => event.stopPropagation();
     const width = this.getAttribute('width', true);
     const height = this.getAttribute('height', true);
-    this.setTag({width: width ? this.width : '480px', height: height ? this.height : '270px'});
+    this.setTag({ width: width ? this.width : '480px', height: height ? this.height : '270px' });
     const lazyLoad = this.getAttribute('lazyLoad', true, false);
     if (!lazyLoad) {
       const url = this.getAttribute('url', true);
@@ -96,7 +96,7 @@ export default class ScomVideo extends Module {
     if (videoId) return `https://www.youtube.com/embed/${videoId}`;
     return this.data.url;
   }
-  
+
   private getVideoId(url: string) {
     let regex = /(youtu.*be.*)\/(watch\?v=|watch\?.+&v=|live\/|shorts\/|embed\/|v\/|)(.*?((?=[&#?])|$))/gm;
     return regex.exec(url)?.[3] || url;
@@ -106,21 +106,30 @@ export default class ScomVideo extends Module {
     if (this.data.url.endsWith('.mp4') || this.data.url.endsWith('.mov')) {
       if (!this.videoEl || !(this.videoEl instanceof ScomVideo)) {
         this.videoEl = <i-video width={'100%'} height={'100%'} display='block'></i-video>
+
+        this.pnlVideo.clearInnerHTML()
+        this.pnlVideo.append(this.videoEl)
+        this.videoEl.url = this.data.url;
       }
-    } 
+    }
     else if (this.ism3u8) {
       if (!this.videoEl || !(this.videoEl instanceof ScomVideo)) {
         this.videoEl = <i-video isStreaming={true} width={'100%'} height={'100%'} display='block'></i-video>
-      }
-    } 
-    else {
-      if (!this.videoEl || !(this.videoEl instanceof Iframe)) {
-        this.videoEl = <i-iframe width="100%" height="100%" display="flex" allowFullscreen={true}></i-iframe>
+
+        this.pnlVideo.clearInnerHTML()
+        this.pnlVideo.append(this.videoEl)
+        this.videoEl.url = this.data.url;
       }
     }
-    this.pnlVideo.clearInnerHTML()
-    this.pnlVideo.append(this.videoEl)
-    this.videoEl.url = this.ism3u8 ? this.data.url : this.getUrl()
+    else {// should be YouTube
+      if (!this.videoEl || !(this.videoEl instanceof Iframe)) {
+        this.videoEl = <i-iframe width="100%" height="100%" display="flex" allowFullscreen={true}></i-iframe>
+
+        this.pnlVideo.clearInnerHTML()
+        this.pnlVideo.append(this.videoEl)
+        this.videoEl.url = this.getUrl();
+      }
+    }
   }
 
   private getTag() {
@@ -131,7 +140,7 @@ export default class ScomVideo extends Module {
     this.tag = value;
   }
 
-  getConfigurators(type?:'defaultLinkYoutube'|'defaultLinkM3u8'|'defaultLinkEmpty') {
+  getConfigurators(type?: 'defaultLinkYoutube' | 'defaultLinkMp4' | 'defaultLinkM3u8' | 'defaultLinkEmpty') {
     const self = this;
     return [
       {
@@ -142,16 +151,19 @@ export default class ScomVideo extends Module {
         },
         getData: this.getData.bind(this),
         setData: async (data: IData) => {
-          let defaultData = dataJson.defaultBuilderData3;
-          switch (type){
+          let defaultData = dataJson.defaultBuilderData4; //empty
+          switch (type) {
             case 'defaultLinkYoutube':
               defaultData = dataJson.defaultBuilderData;
               break;
-            case 'defaultLinkM3u8':
+            case 'defaultLinkMp4':
               defaultData = dataJson.defaultBuilderData2;
               break;
+            case 'defaultLinkM3u8':
+              defaultData = dataJson.defaultBuilderData3;
+              break;
           }
-          await this.setData({...defaultData, ...data})
+          await this.setData({ ...defaultData, ...data })
         },
         getTag: this.getTag.bind(this),
         setTag: this.setTag.bind(this)
@@ -193,7 +205,7 @@ export default class ScomVideo extends Module {
         },
         setData: async (data: IData) => {
           const defaultData = dataJson.defaultBuilderData as any;
-          await this.setData({...defaultData, ...data})
+          await this.setData({ ...defaultData, ...data })
         },
         getData: this.getData.bind(this),
         getTag: this.getTag.bind(this),
@@ -209,7 +221,7 @@ export default class ScomVideo extends Module {
       properties: {
         url: {
           type: "string",
-          tooltip: "Examples:\nYouTube full link: https://www.youtube.com/watch?v=dQw4w9WgXcQ,\nnYouTube video ID: dQw4w9WgXcQ\n",
+          tooltip: "Examples:\nYouTube full link: https://www.youtube.com/watch?v=dQw4w9WgXcQ,\nYouTube video ID: dQw4w9WgXcQ\nmp4 file: https://static.flot.ai/file/karavideo/happy-cat.mp4",
         }
       }
     };
@@ -223,20 +235,20 @@ export default class ScomVideo extends Module {
         name: 'Edit',
         icon: 'edit',
         command: (builder: any, userInputData: any) => {
-          let oldData = {url: ''};
+          let oldData = { url: '' };
           return {
             execute: () => {
-              oldData = {...this.data};
+              oldData = { ...this.data };
               if (userInputData?.url) this.data.url = userInputData.url;
               this.updateVideo();
               if (builder?.setData) builder.setData(this.data);
             },
             undo: () => {
-              this.data = {...oldData};
+              this.data = { ...oldData };
               this.updateVideo();
               if (builder?.setData) builder.setData(this.data);
             },
-            redo: () => {}
+            redo: () => { }
           }
         },
         userInputDataSchema: propertiesSchema as IDataSchema
