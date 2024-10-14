@@ -4,10 +4,6 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-define("@scom/scom-video/interface.ts", ["require", "exports"], function (require, exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-});
 define("@scom/scom-video/data.json.ts", ["require", "exports"], function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
@@ -28,121 +24,25 @@ define("@scom/scom-video/data.json.ts", ["require", "exports"], function (requir
         },
     };
 });
-define("@scom/scom-video/index.css.ts", ["require", "exports", "@ijstech/components"], function (require, exports, components_1) {
+define("@scom/scom-video/model.ts", ["require", "exports", "@scom/scom-video/data.json.ts"], function (require, exports, data_json_1) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    const Theme = components_1.Styles.Theme.ThemeVars;
-    components_1.Styles.cssRule('i-scom-video', {
-        $nest: {
-            '#pnlModule': {
-                height: '100%'
-            },
-            '.video-js  .vjs-big-play-button': {
-                top: '50%',
-                left: '50%',
-                transform: 'translate(-50%, -50%)'
-            },
-            'i-iframe': {
-                aspectRatio: '16/9'
-            },
-            'i-video video': {
-                aspectRatio: '16/9'
-            }
-        }
-    });
-});
-define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/scom-video/data.json.ts", "@scom/scom-video/index.css.ts"], function (require, exports, components_2, data_json_1) {
-    "use strict";
-    var ScomVideo_1;
-    Object.defineProperty(exports, "__esModule", { value: true });
-    let ScomVideo = ScomVideo_1 = class ScomVideo extends components_2.Module {
-        constructor(parent, options) {
-            super(parent, options);
-            this.data = {
-                url: ''
-            };
-            this.tag = {};
-        }
-        static async create(options, parent) {
-            let self = new this(parent, options);
-            await self.ready();
-            return self;
+    exports.Model = void 0;
+    class Model {
+        constructor(module) {
+            this._data = { url: '' };
+            this.module = module;
         }
         get url() {
-            return this.data.url ?? '';
+            return this._data.url || '';
         }
         set url(value) {
-            this.data.url = value ?? '';
-            this.updateVideo();
+            this._data.url = value ?? '';
+            this.updateWidget();
         }
         get ism3u8() {
             const regex = /.*\.m3u8$/gi;
-            return regex.test(this.data?.url || '');
-        }
-        async init() {
-            super.init();
-            if (!this.onClick)
-                this.onClick = (target, event) => event.stopPropagation();
-            const width = this.getAttribute('width', true);
-            const height = this.getAttribute('height', true);
-            this.setTag({ width: width ? this.width : '480px', height: height ? this.height : '270px' });
-            const lazyLoad = this.getAttribute('lazyLoad', true, false);
-            if (!lazyLoad) {
-                const url = this.getAttribute('url', true);
-                if (url)
-                    await this.setData({ url });
-            }
-        }
-        getData() {
-            return this.data;
-        }
-        async setData(value) {
-            this.data = value;
-            this.updateVideo();
-        }
-        getUrl() {
-            if (!this.data.url)
-                return '';
-            const videoId = this.getVideoId(this.data.url);
-            if (videoId)
-                return `https://www.youtube.com/embed/${videoId}`;
-            return this.data.url;
-        }
-        getVideoId(url) {
-            let regex = /(youtu.*be.*)\/(watch\?v=|watch\?.+&v=|live\/|shorts\/|embed\/|v\/|)(.*?((?=[&#?])|$))/gm;
-            return regex.exec(url)?.[3] || url;
-        }
-        updateVideo() {
-            if (this.data.url.endsWith('.mp4') || this.data.url.endsWith('.mov')) {
-                if (!this.videoEl || !(this.videoEl instanceof ScomVideo_1)) {
-                    this.videoEl = this.$render("i-video", { width: '100%', height: '100%', display: 'block' });
-                    this.pnlVideo.clearInnerHTML();
-                    this.pnlVideo.append(this.videoEl);
-                    this.videoEl.url = this.data.url;
-                }
-            }
-            else if (this.ism3u8) {
-                if (!this.videoEl || !(this.videoEl instanceof ScomVideo_1)) {
-                    this.videoEl = this.$render("i-video", { isStreaming: true, width: '100%', height: '100%', display: 'block' });
-                    this.pnlVideo.clearInnerHTML();
-                    this.pnlVideo.append(this.videoEl);
-                    this.videoEl.url = this.data.url;
-                }
-            }
-            else { // should be YouTube
-                if (!this.videoEl || !(this.videoEl instanceof components_2.Iframe)) {
-                    this.videoEl = this.$render("i-iframe", { width: "100%", height: "100%", display: "flex", allowFullscreen: true });
-                    this.pnlVideo.clearInnerHTML();
-                    this.pnlVideo.append(this.videoEl);
-                    this.videoEl.url = this.getUrl();
-                }
-            }
-        }
-        getTag() {
-            return this.tag;
-        }
-        async setTag(value) {
-            this.tag = value;
+            return regex.test(this._data?.url || '');
         }
         getConfigurators(type) {
             const self = this;
@@ -179,7 +79,7 @@ define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/
                         return this._getActions();
                     },
                     getLinkParams: () => {
-                        const data = this.data || {};
+                        const data = this._data || {};
                         return {
                             data: window.btoa(JSON.stringify(data))
                         };
@@ -190,7 +90,7 @@ define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/
                             const decodedString = window.atob(utf8String);
                             const newData = JSON.parse(decodedString);
                             let resultingData = {
-                                ...self.data,
+                                ...self._data,
                                 ...newData
                             };
                             await this.setData(resultingData);
@@ -240,18 +140,18 @@ define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/
                         let oldData = { url: '' };
                         return {
                             execute: () => {
-                                oldData = { ...this.data };
+                                oldData = { ...this._data };
                                 if (userInputData?.url)
-                                    this.data.url = userInputData.url;
-                                this.updateVideo();
+                                    this._data.url = userInputData.url;
+                                this.updateWidget();
                                 if (builder?.setData)
-                                    builder.setData(this.data);
+                                    builder.setData(this._data);
                             },
                             undo: () => {
-                                this.data = { ...oldData };
-                                this.updateVideo();
+                                this._data = { ...oldData };
+                                this.updateWidget();
                                 if (builder?.setData)
-                                    builder.setData(this.data);
+                                    builder.setData(this._data);
                             },
                             redo: () => { }
                         };
@@ -260,6 +160,172 @@ define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/
                 }
             ];
             return actions;
+        }
+        async setData(value) {
+            this._data = value;
+            this.updateWidget();
+        }
+        getData() {
+            return this._data;
+        }
+        getTag() {
+            return this.module.tag;
+        }
+        setTag(value) {
+            const newValue = value || {};
+            for (let prop in newValue) {
+                if (newValue.hasOwnProperty(prop)) {
+                    if (prop === 'light' || prop === 'dark')
+                        this.updateTag(prop, newValue[prop]);
+                    else
+                        this.module.tag[prop] = newValue[prop];
+                }
+            }
+            this.updateTheme();
+        }
+        updateTag(type, value) {
+            this.module.tag[type] = this.module.tag[type] ?? {};
+            for (let prop in value) {
+                if (value.hasOwnProperty(prop))
+                    this.module.tag[type][prop] = value[prop];
+            }
+        }
+        updateStyle(name, value) {
+            if (value) {
+                this.module.style.setProperty(name, value);
+            }
+            else {
+                this.module.style.removeProperty(name);
+            }
+        }
+        updateTheme() {
+            const themeVar = document.body.style.getPropertyValue('--theme') || 'light';
+            this.updateStyle('--text-primary', this.module.tag[themeVar]?.fontColor);
+            this.updateStyle('--background-main', this.module.tag[themeVar]?.backgroundColor);
+        }
+        getUrl() {
+            if (!this.url)
+                return '';
+            const videoId = this.getVideoId(this.url);
+            if (videoId)
+                return `https://www.youtube.com/embed/${videoId}`;
+            return this.url;
+        }
+        getVideoId(url) {
+            let regex = /(youtu.*be.*)\/(watch\?v=|watch\?.+&v=|live\/|shorts\/|embed\/|v\/|)(.*?((?=[&#?])|$))/gm;
+            return regex.exec(url)?.[3] || url;
+        }
+    }
+    exports.Model = Model;
+});
+define("@scom/scom-video/index.css.ts", ["require", "exports", "@ijstech/components"], function (require, exports, components_1) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    const Theme = components_1.Styles.Theme.ThemeVars;
+    components_1.Styles.cssRule('i-scom-video', {
+        $nest: {
+            '#pnlModule': {
+                height: '100%'
+            },
+            '.video-js  .vjs-big-play-button': {
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)'
+            },
+            'i-iframe': {
+                aspectRatio: '16/9'
+            },
+            'i-video video': {
+                aspectRatio: '16/9'
+            }
+        }
+    });
+});
+define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/scom-video/model.ts", "@scom/scom-video/index.css.ts"], function (require, exports, components_2, model_1) {
+    "use strict";
+    var ScomVideo_1;
+    Object.defineProperty(exports, "__esModule", { value: true });
+    let ScomVideo = ScomVideo_1 = class ScomVideo extends components_2.Module {
+        constructor(parent, options) {
+            super(parent, options);
+            this.tag = {};
+        }
+        static async create(options, parent) {
+            let self = new this(parent, options);
+            await self.ready();
+            return self;
+        }
+        get url() {
+            return this.model.url;
+        }
+        set url(value) {
+            this.model.url = value ?? '';
+        }
+        get ism3u8() {
+            return this.model.ism3u8;
+        }
+        getConfigurators(type) {
+            this.initModel();
+            return this.model.getConfigurators(type);
+        }
+        getData() {
+            return this.model.getData();
+        }
+        async setData(value) {
+            this.model.setData(value);
+        }
+        getTag() {
+            return this.tag;
+        }
+        async setTag(value) {
+            this.model.setTag(value);
+        }
+        updateVideo() {
+            if (this.url.endsWith('.mp4') || this.url.endsWith('.mov')) {
+                if (!this.videoEl || !(this.videoEl instanceof ScomVideo_1)) {
+                    this.videoEl = this.$render("i-video", { width: '100%', height: '100%', display: "block" });
+                    this.pnlVideo.clearInnerHTML();
+                    this.pnlVideo.append(this.videoEl);
+                    this.videoEl.url = this.url;
+                }
+            }
+            else if (this.ism3u8) {
+                if (!this.videoEl || !(this.videoEl instanceof ScomVideo_1)) {
+                    this.videoEl = this.$render("i-video", { isStreaming: true, width: '100%', height: '100%', display: "block" });
+                    this.pnlVideo.clearInnerHTML();
+                    this.pnlVideo.append(this.videoEl);
+                    this.videoEl.url = this.url;
+                }
+            }
+            else { // should be YouTube
+                if (!this.videoEl || !(this.videoEl instanceof components_2.Iframe)) {
+                    this.videoEl = this.$render("i-iframe", { width: "100%", height: "100%", display: "flex", allowFullscreen: true });
+                    this.pnlVideo.clearInnerHTML();
+                    this.pnlVideo.append(this.videoEl);
+                    this.videoEl.url = this.model.getUrl();
+                }
+            }
+        }
+        initModel() {
+            if (!this.model) {
+                this.model = new model_1.Model(this);
+                this.model.updateWidget = this.updateVideo.bind(this);
+            }
+        }
+        async init() {
+            this.initModel();
+            super.init();
+            if (!this.onClick)
+                this.onClick = (target, event) => event.stopPropagation();
+            const width = this.getAttribute('width', true);
+            const height = this.getAttribute('height', true);
+            this.setTag({ width: width ? this.width : '480px', height: height ? this.height : '270px' });
+            const lazyLoad = this.getAttribute('lazyLoad', true, false);
+            if (!lazyLoad) {
+                const url = this.getAttribute('url', true);
+                if (url)
+                    await this.setData({ url });
+            }
         }
         render() {
             return (this.$render("i-panel", { id: "pnlVideo", width: '100%', height: '100%' }));

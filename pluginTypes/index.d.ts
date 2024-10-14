@@ -1,21 +1,4 @@
-/// <amd-module name="@scom/scom-video/interface.ts" />
-declare module "@scom/scom-video/interface.ts" {
-    import { IDataSchema } from "@ijstech/components";
-    export interface ICommand {
-        execute(): void;
-        undo(): void;
-        redo(): void;
-    }
-    export interface IPageBlockAction {
-        name: string;
-        icon: string;
-        command: (builder: any, userInputData: any) => ICommand;
-        userInputDataSchema: IDataSchema;
-    }
-    export interface IData {
-        url: string;
-    }
-}
+/// <reference path="@ijstech/components/index.d.ts" />
 /// <amd-module name="@scom/scom-video/data.json.ts" />
 declare module "@scom/scom-video/data.json.ts" {
     const _default: {
@@ -35,47 +18,20 @@ declare module "@scom/scom-video/data.json.ts" {
     };
     export default _default;
 }
-/// <amd-module name="@scom/scom-video/index.css.ts" />
-declare module "@scom/scom-video/index.css.ts" { }
-/// <amd-module name="@scom/scom-video" />
-declare module "@scom/scom-video" {
-    import { Module, IDataSchema, Container, ControlElement } from '@ijstech/components';
-    import { IData } from "@scom/scom-video/interface.ts";
-    import "@scom/scom-video/index.css.ts";
-    interface ScomVideoElement extends ControlElement {
-        lazyLoad?: boolean;
-        url: string;
+/// <amd-module name="@scom/scom-video/model.ts" />
+declare module "@scom/scom-video/model.ts" {
+    import { IDataSchema, Module } from '@ijstech/components';
+    export interface IVideoData {
+        url?: string;
     }
-    global {
-        namespace JSX {
-            interface IntrinsicElements {
-                ["i-scom-video"]: ScomVideoElement;
-            }
-        }
-    }
-    export default class ScomVideo extends Module {
-        private data;
-        private pnlVideo;
-        private videoEl;
-        tag: any;
-        defaultEdit?: boolean;
-        validate?: () => boolean;
-        edit: () => Promise<void>;
-        confirm: () => Promise<void>;
-        discard: () => Promise<void>;
-        constructor(parent?: Container, options?: any);
-        static create(options?: ScomVideoElement, parent?: Container): Promise<ScomVideo>;
+    export class Model {
+        private module;
+        private _data;
+        updateWidget: () => void;
+        constructor(module: Module);
         get url(): string;
         set url(value: string);
-        private get ism3u8();
-        init(): Promise<void>;
-        private getData;
-        private setData;
-        private getUrl;
-        private getVideoId;
-        private updateVideo;
-        private getTag;
-        private setTag;
+        get ism3u8(): boolean;
         getConfigurators(type?: 'defaultLinkYoutube' | 'defaultLinkMp4' | 'defaultLinkM3u8' | 'defaultLinkEmpty'): ({
             name: string;
             target: string;
@@ -90,7 +46,7 @@ declare module "@scom/scom-video" {
                 userInputDataSchema: IDataSchema;
             }[];
             getData: any;
-            setData: (data: IData) => Promise<void>;
+            setData: (data: IVideoData) => Promise<void>;
             getTag: any;
             setTag: any;
             getLinkParams?: undefined;
@@ -119,6 +75,94 @@ declare module "@scom/scom-video" {
         })[];
         private getPropertiesSchema;
         private _getActions;
+        setData(value: IVideoData): Promise<void>;
+        getData(): IVideoData;
+        getTag(): any;
+        setTag(value: any): void;
+        private updateTag;
+        private updateStyle;
+        private updateTheme;
+        getUrl(): string;
+        private getVideoId;
+    }
+}
+/// <amd-module name="@scom/scom-video/index.css.ts" />
+declare module "@scom/scom-video/index.css.ts" { }
+/// <amd-module name="@scom/scom-video" />
+declare module "@scom/scom-video" {
+    import { Module, Container, ControlElement } from '@ijstech/components';
+    import { IVideoData } from "@scom/scom-video/model.ts";
+    import "@scom/scom-video/index.css.ts";
+    interface ScomVideoElement extends ControlElement {
+        lazyLoad?: boolean;
+        url: string;
+    }
+    global {
+        namespace JSX {
+            interface IntrinsicElements {
+                ["i-scom-video"]: ScomVideoElement;
+            }
+        }
+    }
+    export default class ScomVideo extends Module {
+        private model;
+        private pnlVideo;
+        private videoEl;
+        tag: any;
+        defaultEdit?: boolean;
+        constructor(parent?: Container, options?: any);
+        static create(options?: ScomVideoElement, parent?: Container): Promise<ScomVideo>;
+        get url(): string;
+        set url(value: string);
+        get ism3u8(): boolean;
+        getConfigurators(type?: 'defaultLinkYoutube' | 'defaultLinkMp4' | 'defaultLinkM3u8' | 'defaultLinkEmpty'): ({
+            name: string;
+            target: string;
+            getActions: () => {
+                name: string;
+                icon: string;
+                command: (builder: any, userInputData: any) => {
+                    execute: () => void;
+                    undo: () => void;
+                    redo: () => void;
+                };
+                userInputDataSchema: import("@ijstech/components").IDataSchema;
+            }[];
+            getData: any;
+            setData: (data: IVideoData) => Promise<void>;
+            getTag: any;
+            setTag: any;
+            getLinkParams?: undefined;
+            setLinkParams?: undefined;
+        } | {
+            name: string;
+            target: string;
+            getActions: () => {
+                name: string;
+                icon: string;
+                command: (builder: any, userInputData: any) => {
+                    execute: () => void;
+                    undo: () => void;
+                    redo: () => void;
+                };
+                userInputDataSchema: import("@ijstech/components").IDataSchema;
+            }[];
+            getLinkParams: () => {
+                data: string;
+            };
+            setLinkParams: (params: any) => Promise<void>;
+            getData: any;
+            setData: any;
+            getTag: any;
+            setTag: any;
+        })[];
+        getData(): IVideoData;
+        setData(value: IVideoData): Promise<void>;
+        getTag(): any;
+        setTag(value: any): Promise<void>;
+        private updateVideo;
+        private initModel;
+        init(): Promise<void>;
         render(): any;
     }
 }
