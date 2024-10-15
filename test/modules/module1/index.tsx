@@ -26,6 +26,7 @@ export default class Module1 extends Module {
         this.widgetModule.openModal({
             width: '90%',
             maxWidth: '90rem',
+            minHeight: 370,
             padding: { top: 0, bottom: 0, left: 0, right: 0 },
             closeOnBackdropClick: true,
             closeIcon: null
