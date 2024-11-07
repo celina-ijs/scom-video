@@ -264,6 +264,110 @@ define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/
         get ism3u8() {
             return this.model.ism3u8;
         }
+        addBlock(blocknote, executeFn, callbackFn) {
+            const findRegex = /(?:https?:\/\/\S+\.(?:mp4|webm|mov|ogg|m3u8))|(?:https:\/\/(?:www\.|m\.)?(youtu.*be.*)\/(?:watch\?v=|embed\/|v|shorts|)(.*?((?=[&#?])|$)))/g;
+            function getData(element) {
+                const url = element.getAttribute('href');
+                if (url) {
+                    const match = findRegex.test(url);
+                    findRegex.lastIndex = 0;
+                    if (match) {
+                        return { url };
+                    }
+                }
+                return false;
+            }
+            const VideoBlock = blocknote.createBlockSpec({
+                type: "video",
+                propSchema: {
+                    ...blocknote.defaultProps,
+                    url: { default: '' },
+                    width: { default: 512 },
+                    height: { default: 'auto' }
+                },
+                content: "none"
+            }, {
+                render: (block) => {
+                    const wrapper = new components_2.Panel();
+                    const { url } = JSON.parse(JSON.stringify(block.props));
+                    const customElm = new ScomVideo_1(wrapper, { url });
+                    if (typeof callbackFn === 'function')
+                        callbackFn(customElm, block);
+                    wrapper.appendChild(customElm);
+                    return {
+                        dom: wrapper
+                    };
+                },
+                parseFn: () => {
+                    return [
+                        {
+                            tag: "div[data-content-type=video]",
+                            node: 'video'
+                        },
+                        {
+                            tag: "a",
+                            getAttrs: (element) => {
+                                if (typeof element === "string")
+                                    return false;
+                                return getData(element);
+                            },
+                            priority: 404,
+                            node: 'video'
+                        },
+                        {
+                            tag: "p",
+                            getAttrs: (element) => {
+                                if (typeof element === "string")
+                                    return false;
+                                const child = element.firstChild;
+                                if (child?.nodeName === 'A') {
+                                    return getData(child);
+                                }
+                                return false;
+                            },
+                            priority: 405,
+                            node: 'video'
+                        }
+                    ];
+                },
+                toExternalHTML: (block, editor) => {
+                    const link = document.createElement("a");
+                    const url = block.props.url || "";
+                    link.setAttribute("href", url);
+                    link.textContent = 'video';
+                    const wrapper = document.createElement("p");
+                    wrapper.appendChild(link);
+                    return {
+                        dom: wrapper
+                    };
+                },
+                pasteRules: [
+                    {
+                        find: findRegex,
+                        handler(props) {
+                            const { state, chain, range } = props;
+                            const textContent = state.doc.resolve(range.from).nodeAfter?.textContent;
+                            chain().BNUpdateBlock(state.selection.from, {
+                                type: "video",
+                                props: {
+                                    url: textContent
+                                },
+                            }).setTextSelection(range.from + 1);
+                        }
+                    }
+                ]
+            });
+            const VideoSlashItem = {
+                name: "Video",
+                execute: (editor) => {
+                    const block = { type: "video", props: { url: "" } };
+                    if (typeof executeFn === 'function')
+                        executeFn(editor, block);
+                },
+                aliases: ["video", "media"]
+            };
+            return { block: VideoBlock, slashItem: VideoSlashItem };
+        }
         getConfigurators(type) {
             this.initModel();
             return this.model.getConfigurators(type);

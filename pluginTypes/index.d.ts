@@ -104,7 +104,14 @@ declare module "@scom/scom-video" {
             }
         }
     }
-    export default class ScomVideo extends Module {
+    type executeFnType = (editor: any, block: any) => void;
+    interface BlockSpecs {
+        addBlock: (blocknote: any, executeFn: executeFnType, callbackFn?: any) => {
+            block: any;
+            slashItem: any;
+        };
+    }
+    export default class ScomVideo extends Module implements BlockSpecs {
         private model;
         private pnlVideo;
         private videoEl;
@@ -115,6 +122,14 @@ declare module "@scom/scom-video" {
         get url(): string;
         set url(value: string);
         get ism3u8(): boolean;
+        addBlock(blocknote: any, executeFn: executeFnType, callbackFn?: any): {
+            block: any;
+            slashItem: {
+                name: string;
+                execute: (editor: any) => void;
+                aliases: string[];
+            };
+        };
         getConfigurators(type?: 'defaultLinkYoutube' | 'defaultLinkMp4' | 'defaultLinkM3u8' | 'defaultLinkEmpty'): ({
             name: string;
             target: string;
