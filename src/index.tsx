@@ -9,6 +9,7 @@ import {
   Control
 } from '@ijstech/components';
 import { IVideoData, Model } from './model';
+import { BlockNoteSpecs, callbackFnType, executeFnType } from '@scom/scom-blocknote-sdk';
 import './index.css';
 
 interface ScomVideoElement extends ControlElement {
@@ -24,14 +25,9 @@ declare global {
   }
 }
 
-type executeFnType = (editor: any, block: any) => void;
-interface BlockSpecs {
-  addBlock: (blocknote: any, executeFn: executeFnType, callbackFn?: any) => { block: any, slashItem: any };
-}
-
 @customModule
 @customElements('i-scom-video')
-export default class ScomVideo extends Module implements BlockSpecs {
+export default class ScomVideo extends Module implements BlockNoteSpecs {
   private model: Model;
   private pnlVideo: Panel;
   private videoEl: any;
@@ -61,7 +57,7 @@ export default class ScomVideo extends Module implements BlockSpecs {
     return this.model.ism3u8;
   }
 
-  addBlock(blocknote: any, executeFn: executeFnType, callbackFn?: any) {
+  addBlock(blocknote: any, executeFn: executeFnType, callbackFn?: callbackFnType) {
     const findRegex = /(?:https?:\/\/\S+\.(?:mp4|webm|mov|ogg|m3u8))|(?:https:\/\/(?:www\.|m\.)?(youtu.*be.*)\/(?:watch\?v=|embed\/|v|shorts|)(.*?((?=[&#?])|$)))/g;
     function getData(element: HTMLElement) {
       const url = element.getAttribute('href')

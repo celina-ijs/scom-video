@@ -14,9 +14,12 @@
         "test": "cd test && npm run test && cd .."
     },
     "keywords": [],
+    "dependencies": {
+        "@ijstech/components": "^0.1.115",
+        "@scom/scom-blocknote-sdk": "https://github.com/scom-repos/scom-blocknote-sdk"
+    },
     "devDependencies": {
         "@ijstech/cli": "^0.1.26",
-        "@ijstech/compiler": "^0.1.18",
-        "@ijstech/components": "^0.1.38"
+        "@ijstech/compiler": "^0.1.18"
     }
 }

@@ -92,6 +92,7 @@ declare module "@scom/scom-video/index.css.ts" { }
 declare module "@scom/scom-video" {
     import { Module, Container, ControlElement } from '@ijstech/components';
     import { IVideoData } from "@scom/scom-video/model.ts";
+    import { BlockNoteSpecs, callbackFnType, executeFnType } from '@scom/scom-blocknote-sdk';
     import "@scom/scom-video/index.css.ts";
     interface ScomVideoElement extends ControlElement {
         lazyLoad?: boolean;
@@ -104,14 +105,7 @@ declare module "@scom/scom-video" {
             }
         }
     }
-    type executeFnType = (editor: any, block: any) => void;
-    interface BlockSpecs {
-        addBlock: (blocknote: any, executeFn: executeFnType, callbackFn?: any) => {
-            block: any;
-            slashItem: any;
-        };
-    }
-    export default class ScomVideo extends Module implements BlockSpecs {
+    export default class ScomVideo extends Module implements BlockNoteSpecs {
         private model;
         private pnlVideo;
         private videoEl;
@@ -122,7 +116,7 @@ declare module "@scom/scom-video" {
         get url(): string;
         set url(value: string);
         get ism3u8(): boolean;
-        addBlock(blocknote: any, executeFn: executeFnType, callbackFn?: any): {
+        addBlock(blocknote: any, executeFn: executeFnType, callbackFn?: callbackFnType): {
             block: any;
             slashItem: {
                 name: string;
