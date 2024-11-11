@@ -58,6 +58,7 @@ export default class ScomVideo extends Module implements BlockNoteSpecs {
   }
 
   addBlock(blocknote: any, executeFn: executeFnType, callbackFn?: callbackFnType) {
+    const blockType = 'video';
     const findRegex = /(?:https?:\/\/\S+\.(?:mp4|webm|mov|ogg|m3u8))|(?:https:\/\/(?:www\.|m\.)?(youtu.*be.*)\/(?:watch\?v=|embed\/|v|shorts|)(.*?((?=[&#?])|$)))/g;
     function getData(element: HTMLElement) {
       const url = element.getAttribute('href')
@@ -72,7 +73,7 @@ export default class ScomVideo extends Module implements BlockNoteSpecs {
     }
 
     const VideoBlock = blocknote.createBlockSpec({
-      type: "video",
+      type: blockType,
       propSchema: {
         ...blocknote.defaultProps,
         url: {default: ''},
@@ -95,8 +96,8 @@ export default class ScomVideo extends Module implements BlockNoteSpecs {
       parseFn: () => {
         return [
           {
-            tag: "div[data-content-type=video]",
-            node: 'video'
+            tag: `div[data-content-type=${blockType}]`,
+            node: blockType
           },
           {
             tag: "a",
@@ -105,7 +106,7 @@ export default class ScomVideo extends Module implements BlockNoteSpecs {
               return getData(element);
             },
             priority: 404,
-            node: 'video'
+            node: blockType
           },
           {
             tag: "p",
@@ -118,7 +119,7 @@ export default class ScomVideo extends Module implements BlockNoteSpecs {
               return false;
             },
             priority: 405,
-            node: 'video'
+            node: blockType
           }
         ]
       },
@@ -140,7 +141,7 @@ export default class ScomVideo extends Module implements BlockNoteSpecs {
             const { state, chain, range } = props;
             const textContent = state.doc.resolve(range.from).nodeAfter?.textContent;
             chain().BNUpdateBlock(state.selection.from, {
-              type: "video",
+              type: blockType,
               props: {
                 url: textContent
               },
@@ -149,16 +150,25 @@ export default class ScomVideo extends Module implements BlockNoteSpecs {
         }
       ]
     });
+
     const VideoSlashItem = {
       name: "Video",
       execute: (editor: any) => {
-        const block = { type: "video", props: { url: "" }};
+        const block = { type: blockType, props: { url: "" }};
         if (typeof executeFn === 'function') executeFn(editor, block);
       },
-      aliases: ["video", "media"]
-    }  
+      aliases: ["video", "media"],
+      group: "Media",
+      icon: {name: 'video'},
+      hint: "Insert a video"
+    }
 
-    return { block: VideoBlock, slashItem: VideoSlashItem };
+    const moduleData = {
+      name: '@scom/scom-video',
+      localPath: 'scom-video'
+    }
+
+    return { block: VideoBlock, slashItem: VideoSlashItem, moduleData };
   }
 
   getConfigurators(type?: 'defaultLinkYoutube' | 'defaultLinkMp4' | 'defaultLinkM3u8' | 'defaultLinkEmpty') {

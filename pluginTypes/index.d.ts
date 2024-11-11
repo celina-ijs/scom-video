@@ -122,6 +122,15 @@ declare module "@scom/scom-video" {
                 name: string;
                 execute: (editor: any) => void;
                 aliases: string[];
+                group: string;
+                icon: {
+                    name: string;
+                };
+                hint: string;
+            };
+            moduleData: {
+                name: string;
+                localPath: string;
             };
         };
         getConfigurators(type?: 'defaultLinkYoutube' | 'defaultLinkMp4' | 'defaultLinkM3u8' | 'defaultLinkEmpty'): ({
