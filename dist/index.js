@@ -265,6 +265,7 @@ define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/
             return this.model.ism3u8;
         }
         addBlock(blocknote, executeFn, callbackFn) {
+            const blockType = 'video';
             const findRegex = /(?:https?:\/\/\S+\.(?:mp4|webm|mov|ogg|m3u8))|(?:https:\/\/(?:www\.|m\.)?(youtu.*be.*)\/(?:watch\?v=|embed\/|v|shorts|)(.*?((?=[&#?])|$)))/g;
             function getData(element) {
                 const url = element.getAttribute('href');
@@ -278,7 +279,7 @@ define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/
                 return false;
             }
             const VideoBlock = blocknote.createBlockSpec({
-                type: "video",
+                type: blockType,
                 propSchema: {
                     ...blocknote.defaultProps,
                     url: { default: '' },
@@ -301,8 +302,8 @@ define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/
                 parseFn: () => {
                     return [
                         {
-                            tag: "div[data-content-type=video]",
-                            node: 'video'
+                            tag: `div[data-content-type=${blockType}]`,
+                            node: blockType
                         },
                         {
                             tag: "a",
@@ -312,7 +313,7 @@ define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/
                                 return getData(element);
                             },
                             priority: 404,
-                            node: 'video'
+                            node: blockType
                         },
                         {
                             tag: "p",
@@ -326,7 +327,7 @@ define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/
                                 return false;
                             },
                             priority: 405,
-                            node: 'video'
+                            node: blockType
                         }
                     ];
                 },
@@ -348,7 +349,7 @@ define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/
                             const { state, chain, range } = props;
                             const textContent = state.doc.resolve(range.from).nodeAfter?.textContent;
                             chain().BNUpdateBlock(state.selection.from, {
-                                type: "video",
+                                type: blockType,
                                 props: {
                                     url: textContent
                                 },
@@ -360,13 +361,20 @@ define("@scom/scom-video", ["require", "exports", "@ijstech/components", "@scom/
             const VideoSlashItem = {
                 name: "Video",
                 execute: (editor) => {
-                    const block = { type: "video", props: { url: "" } };
+                    const block = { type: blockType, props: { url: "" } };
                     if (typeof executeFn === 'function')
                         executeFn(editor, block);
                 },
-                aliases: ["video", "media"]
+                aliases: ["video", "media"],
+                group: "Media",
+                icon: { name: 'video' },
+                hint: "Insert a video"
             };
-            return { block: VideoBlock, slashItem: VideoSlashItem };
+            const moduleData = {
+                name: '@scom/scom-video',
+                localPath: 'scom-video'
+            };
+            return { block: VideoBlock, slashItem: VideoSlashItem, moduleData };
         }
         getConfigurators(type) {
             this.initModel();
